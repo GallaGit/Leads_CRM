@@ -1,4 +1,4 @@
-﻿# === Leads_CRM — un solo .gitignore en la raíz ===
+﻿# Leads_CRM
 
 # Dependencias
 node_modules/
@@ -52,11 +52,15 @@ __pycache__/
 venv/
 *.pyc
 
-# Investigación y notas locales — no van al remoto
+# Solo locales en esta máquina — no van al remoto de la app
+.agents/
+.cursor/
 Nicho/
 Notas/
 Notas-de-ideas/
+skills-lock.json
 
-# Copia/worktree duplicada y carpeta antigua (bloqueada por el IDE; la app es Leads_CRM/)
-dashboard-master/
+# Copias antiguas (por si reaparecen)
 dashboard/
+dashboard-master/
+Leads_CRM/
