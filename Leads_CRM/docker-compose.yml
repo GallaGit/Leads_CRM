@@ -1,0 +1,23 @@
+# Leads_CRM — local Docker Desktop stack
+# Docker container names cannot contain spaces → "Leads-CRM"
+name: leads-crm
+
+services:
+  app:
+    container_name: Leads-CRM
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3020:3000"
+    env_file:
+      - .env.local
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      # Avast SSL scanning MITM — export with: powershell -File scripts/export-avast-ca.ps1
+      NODE_EXTRA_CA_CERTS: /certs/avast-web-mail-shield-root.pem
+    volumes:
+      - ./certs/avast-web-mail-shield-root.pem:/certs/avast-web-mail-shield-root.pem:ro
+    restart: unless-stopped

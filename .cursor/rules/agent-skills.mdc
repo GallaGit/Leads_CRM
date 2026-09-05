@@ -17,8 +17,8 @@ Inventario en `skills-lock.json`. No instales skills nuevas sin que el usuario l
 | Rutas lentas, first paint, Cache Components, navegación instantánea | `next-cache-components-optimizer` | `.agents/skills/next-cache-components-optimizer/SKILL.md` |
 | Tests, E2E, verificar UI en el navegador, Playwright | `webapp-testing` | `.agents/skills/webapp-testing/SKILL.md` |
 | Auth, APIs, input de usuario, secretos, Notion, n8n, revisión de seguridad | `code-security` | `.agents/skills/code-security/SKILL.md` |
-| README, arquitectura, runbooks, docs en `dashboard/docs/` | `documentation` | `.agents/skills/documentation/SKILL.md` |
-| UI, UX, accesibilidad, layout del dashboard | `web-design-guidelines` | `.agents/skills/web-design-guidelines/SKILL.md` |
+| README, arquitectura, runbooks, docs en `Leads_CRM/docs/` | `documentation` | `.agents/skills/documentation/SKILL.md` |
+| UI, UX, accesibilidad, layout de Leads_CRM | `web-design-guidelines` | `.agents/skills/web-design-guidelines/SKILL.md` |
 
 ## Cómo aplicarla
 

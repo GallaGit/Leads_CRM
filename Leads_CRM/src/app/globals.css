@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f7f7f8;
+  --fg: #111113;
+  --panel: #ffffff;
+  --sidebar: #f4f4f5;
+  --muted: #ececee;
+  --muted-hover: #e4e4e7;
+  --muted-fg: #71717a;
+  --border: #e4e4e7;
+  --accent: #5e6ad2;
+  --accent-fg: #ffffff;
+  --ring: #5e6ad2;
+}
+
+.dark {
+  --bg: #0f0f10;
+  --fg: #ececed;
+  --panel: #141415;
+  --sidebar: #111112;
+  --muted: #1c1c1f;
+  --muted-hover: #242428;
+  --muted-fg: #8a8a93;
+  --border: #232326;
+  --accent: #5e6ad2;
+  --accent-fg: #ffffff;
+  --ring: #6e79d6;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+/* Linear-like dense UI */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}

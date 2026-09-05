@@ -1,0 +1,98 @@
+import { NextResponse } from "next/server";
+import { getLeadRepository } from "@/lib/notion/notion-lead-repository";
+import { filterLeads } from "@/lib/leads/filter-leads";
+import { validateLeadCreate } from "@/lib/leads/validate-lead";
+import type { LeadFilters, LeadStatus } from "@/lib/domain/lead";
+
+export const dynamic = "force-dynamic";
+
+function parseBool(v: string | null): boolean | null {
+  if (v === "true") return true;
+  if (v === "false") return false;
+  return null;
+}
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const repo = getLeadRepository();
+    const leads = await repo.list();
+
+    const filters: LeadFilters = {
+      search: searchParams.get("q") || undefined,
+      status: searchParams.getAll("status") as LeadStatus[],
+      province: searchParams.getAll("province"),
+      city: searchParams.getAll("city"),
+      employeesMin: searchParams.get("empMin")
+        ? Number(searchParams.get("empMin"))
+        : null,
+      employeesMax: searchParams.get("empMax")
+        ? Number(searchParams.get("empMax"))
+        : null,
+      createdFrom: searchParams.get("createdFrom"),
+      createdTo: searchParams.get("createdTo"),
+      activityFrom: searchParams.get("activityFrom"),
+      activityTo: searchParams.get("activityTo"),
+      hasEmail: parseBool(searchParams.get("hasEmail")),
+      hasPhone: parseBool(searchParams.get("hasPhone")),
+      hasWebsite: parseBool(searchParams.get("hasWebsite")),
+      hasLinkedin: parseBool(searchParams.get("hasLinkedin")),
+      favorite: parseBool(searchParams.get("favorite")),
+    };
+
+    const filtered = filterLeads(leads, filters);
+    return NextResponse.json({
+      leads: filtered,
+      total: filtered.length,
+      syncedAt: new Date().toISOString(),
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Error al listar leads";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as Record<string, unknown>;
+    const result = validateLeadCreate(body);
+    if (!result.ok || !result.value) {
+      return NextResponse.json(
+        {
+          error: "Datos del lead no válidos",
+          fieldErrors: result.errors,
+        },
+        { status: 400 },
+      );
+    }
+
+    const repo = getLeadRepository();
+    const lead = await repo.create(result.value);
+    return NextResponse.json({ lead }, { status: 201 });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Error al crear el lead";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { ids, patch } = body as {
+      ids: string[];
+      patch: Record<string, unknown>;
+    };
+    if (!ids?.length || !patch) {
+      return NextResponse.json({ error: "ids y patch requeridos" }, { status: 400 });
+    }
+    const repo = getLeadRepository();
+    const updated = [];
+    for (const id of ids) {
+      updated.push(await repo.update(id, patch));
+    }
+    return NextResponse.json({ leads: updated });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Error en actualización masiva";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

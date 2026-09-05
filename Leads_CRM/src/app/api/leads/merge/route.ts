@@ -1,0 +1,88 @@
+import { NextResponse } from "next/server";
+import {
+  buildEmptyFieldMerge,
+  MERGEABLE_FIELD_LABELS,
+} from "@/lib/leads/merge-leads";
+import { getLeadRepository } from "@/lib/notion/notion-lead-repository";
+
+export const dynamic = "force-dynamic";
+
+type MergeBody = {
+  keepId?: unknown;
+  archiveId?: unknown;
+};
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as MergeBody;
+    const keepId =
+      typeof body.keepId === "string" ? body.keepId.trim() : "";
+    const archiveId =
+      typeof body.archiveId === "string" ? body.archiveId.trim() : "";
+
+    if (!keepId || !archiveId) {
+      return NextResponse.json(
+        { error: "Faltan keepId y archiveId" },
+        { status: 400 },
+      );
+    }
+    if (keepId === archiveId) {
+      return NextResponse.json(
+        { error: "keepId y archiveId deben ser distintos" },
+        { status: 400 },
+      );
+    }
+
+    const repo = getLeadRepository();
+    const [keep, archive] = await Promise.all([
+      repo.get(keepId),
+      repo.get(archiveId),
+    ]);
+
+    if (!keep) {
+      return NextResponse.json(
+        { error: "Lead a conservar no encontrado" },
+        { status: 404 },
+      );
+    }
+    if (!archive) {
+      return NextResponse.json(
+        { error: "Lead a archivar no encontrado" },
+        { status: 404 },
+      );
+    }
+
+    const { patch, filledKeys } = buildEmptyFieldMerge(keep, archive);
+
+    let updated = keep;
+    if (Object.keys(patch).length > 0) {
+      updated = await repo.update(keepId, patch);
+    }
+
+    const filledLabels = filledKeys.map((k) => MERGEABLE_FIELD_LABELS[k]);
+    const summary =
+      filledLabels.length > 0
+        ? `Fusión: rellenados ${filledLabels.join(", ")} desde «${archive.companyName}» (${archiveId.slice(0, 8)}…); lead origen archivado.`
+        : `Fusión: sin campos vacíos que rellenar desde «${archive.companyName}» (${archiveId.slice(0, 8)}…); lead origen archivado.`;
+
+    await repo.appendActivity(keepId, summary, "merged");
+
+    if (!archive.archived) {
+      await repo.archive(archiveId);
+    }
+
+    // Re-read keeper after activity/update for fresh lastEditedTime
+    const fresh = (await repo.get(keepId)) ?? updated;
+
+    return NextResponse.json({
+      lead: fresh,
+      filledKeys,
+      filledLabels,
+      archivedId: archiveId,
+    });
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : "Error al fusionar leads";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
