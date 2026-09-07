@@ -1,16 +1,27 @@
 import { NextResponse } from "next/server";
-import { isAuthDisabled } from "@/lib/auth";
-import { n8nClient } from "@/lib/n8n/client";
+import { getSettingsService, toPublicSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
-  const notionOk = Boolean(
-    process.env.NOTION_TOKEN && process.env.NOTION_DATABASE_ID,
-  );
-  return NextResponse.json({
-    authDisabled: isAuthDisabled(),
-    notionConfigured: notionOk,
-    serpapiConfigured: Boolean(process.env.SERPAPI_API_KEY),
-    groqConfigured: Boolean(process.env.GROQ_API_KEY),
-    n8n: n8nClient.listConfigured(),
-  });
+  try {
+    const settings = toPublicSettings(getSettingsService().getRaw());
+    return NextResponse.json({
+      ...settings,
+      // Compat with the previous status payload.
+      notionConfigured: settings.notion.configured,
+      serpapiConfigured: settings.serpapi.configured,
+      groqConfigured: settings.ai.configured,
+      n8n: settings.automations.map((a) => ({
+        action: a.action,
+        configured: a.webhook.configured,
+        enabled: a.enabled,
+      })),
+    });
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : "Error al leer la configuración";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

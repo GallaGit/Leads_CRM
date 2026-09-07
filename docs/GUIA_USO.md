@@ -225,13 +225,31 @@ Al fusionar o archivar, la lista de grupos se actualiza.
 
 Las actualizaciones se procesan secuencialmente contra Notion para reducir errores por límites de API.
 
+## Settings e integraciones
+
+En `/settings` puedes revisar y completar Notion, n8n, IA (Groq) y SerpAPI.
+
+- Los secretos se muestran enmascarados (últimos 4 caracteres).
+- **Guardar** escribe un override en `data/settings.local.json` (fuera de Git). No hace falta reiniciar el servidor.
+- **Probar conexión** valida sin devolver el secreto.
+- `.env.local` sigue siendo el valor de arranque; el archivo local gana si existe override.
+- **Restablecer a .env** (cuando el valor viene del archivo) elimina el override al guardar.
+
+## Automations
+
+En `/automations` hay tres eventos: Nuevo Lead, Lead actualizado y Lead analizado.
+
+- Activa o desactiva cada uno.
+- Pega la URL del webhook (o déjala en `.env`).
+- **Probar** envía un payload de ejemplo. El workflow n8n actual no incluye estos triggers.
+
 ## Tema
 
 El botón de la esquina superior cambia entre tema claro y oscuro. El diseño está optimizado principalmente para escritorio y tablet.
 
 ## Estado de las demás secciones
 
-Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Automations muestra qué webhooks están configurados; la ejecución completa desde la UI sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
+Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations configura y prueba webhooks n8n; el workflow n8n no incluye esos triggers y el análisis IA de dolores sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
 
 ## Diagnóstico rápido
 
@@ -257,7 +275,7 @@ Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operat
 
 ### n8n muestra “Sin webhook”
 
-Es el comportamiento esperado mientras las variables `N8N_WEBHOOK_*` estén vacías. El workflow actual no fue modificado para añadir triggers.
+Configura `N8N_WEBHOOK_LEAD_*` (o los alias `N8N_WEBHOOK_BUSCAR_LEADS` / `ANALIZAR_LEAD` / …) o pega la URL en Automations. El workflow actual no fue modificado para añadir triggers.
 
 ## Calidad
 

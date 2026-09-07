@@ -83,18 +83,30 @@ El mapper:
 - transforma un `LeadPatch` en propiedades Notion;
 - actualiza `Última actualización` en cada escritura.
 
-### Integración n8n
+### Configuración (SettingsService)
 
-Ubicación: `src/lib/n8n/client.ts`.
+Ubicación: `src/lib/settings/`.
 
-La capa reconoce cuatro acciones:
+`SettingsService` mezcla:
 
-- `buscar_leads`
-- `analizar_lead`
-- `generar_email`
-- `ejecutar_workflow`
+1. `process.env` / `.env.local` (valores de arranque);
+2. `data/settings.local.json` (overrides escritos desde la UI; gitignored).
 
-Leads_CRM no modifica el workflow existente. Solo expone un cliente servidor preparado para URLs de webhook configuradas mediante variables de entorno.
+Las APIs de Settings y Automations nunca devuelven secretos completos: solo flags, previews enmascarados (últimos 4) y estado de conexión (`never` | `syncing` | `ok` | `error`, con `lastSyncedAt`). Zustand no guarda claves.
+
+Notion, Groq y SerpAPI leen credenciales a través de este servicio, no de `process.env` en crudo.
+
+## Integración n8n
+
+Ubicación: `src/lib/n8n/client.ts`. Las rutas HTTP no hacen `fetch` a n8n: usan `getAutomationClient()` (`src/lib/automations/get-client.ts`) para poder añadir Make/Zapier más adelante.
+
+Acciones internas (con alias de env legacy):
+
+- `lead_created` (Nuevo Lead) — `N8N_WEBHOOK_LEAD_CREATED`, alias `N8N_WEBHOOK_BUSCAR_LEADS`
+- `lead_updated` (Lead actualizado) — `N8N_WEBHOOK_LEAD_UPDATED`, alias `N8N_WEBHOOK_EJECUTAR` / `N8N_WEBHOOK_GENERAR_EMAIL`
+- `lead_analyzed` (Lead analizado) — `N8N_WEBHOOK_LEAD_ANALYZED`, alias `N8N_WEBHOOK_ANALIZAR_LEAD`
+
+El cliente es HTTP puro: timeout, errores HTTP, JSON inválido y logs (sin URL completa). No contiene lógica de negocio. Leads_CRM no modifica el workflow n8n.
 
 ### Autenticación
 
@@ -189,9 +201,13 @@ Solo filtros y visibilidad de columnas se persisten en `localStorage`. Notion si
 - `PATCH /api/leads/:id`: actualización parcial.
 - `DELETE /api/leads/:id`: archiva.
 - `POST /api/sync`: recupera todos los leads activos.
-- `GET /api/settings/status`: estado de configuración sin secretos.
-- `GET /api/automations/:action`: lista la configuración n8n.
-- `POST /api/automations/:action`: ejecuta el webhook configurado.
+- `GET /api/settings`: configuración pública (enmascarada).
+- `PATCH /api/settings`: guarda overrides en `data/settings.local.json`.
+- `GET /api/settings/status`: igual que GET settings más campos de compatibilidad.
+- `POST /api/settings/test`: prueba una integración (`notion` | `n8n` | `ai` | `serpapi`) sin devolver secretos.
+- `GET /api/automations`: lista automatizaciones (nombre, descripción, activa, webhook enmascarado).
+- `GET|PATCH /api/automations/:action`: lee o actualiza toggle/URL.
+- `POST /api/automations/:action`: dispara el webhook (`{ test: true }` envía un payload de ejemplo).
 
 ## Estructura principal
 
@@ -212,6 +228,7 @@ Solo filtros y visibilidad de columnas se persisten en `localStorage`. Notion si
 │  │  ├─ geo/
 │  │  ├─ leads/
 │  │  ├─ n8n/
+│  │  ├─ settings/
 │  │  ├─ notion/
 │  │  └─ repository/
 │  └─ store/

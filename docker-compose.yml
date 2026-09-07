@@ -23,4 +23,5 @@ services:
       # create a host *directory* with the PEM name, then runc fails with
       # "not a directory". Recreate the container after moving the project.
       - ./certs:/certs:ro
+      - ./data:/app/data
     restart: unless-stopped

@@ -32,4 +32,4 @@ Las notas de `Nicho` son una fuente de investigación, no una especificación t�
 
 La aplicación es local y de un solo usuario. Permite sincronizar leads desde Notion, buscarlos, filtrarlos, abrir un panel de detalle, editar estado/notas/email, marcar favoritos y archivar registros.
 
-Daily Work, Kanban, Email, Statistics y Duplicados (merge seguro de campos vacíos) están operativos. Análisis IA ejecutable pertenece a fases posteriores.
+Daily Work, Kanban, Email, Statistics y Duplicados (merge seguro de campos vacíos) están operativos. Settings e Integraciones (Fase 7 parcial) permiten configurar y probar conexiones. Análisis IA ejecutable pertenece a fases posteriores.

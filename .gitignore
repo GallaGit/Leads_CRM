@@ -52,6 +52,9 @@ __pycache__/
 venv/
 *.pyc
 
+# Overrides de Settings (secretos y estado de conexión)
+data/
+
 # Solo locales en esta máquina — no van al remoto de la app
 .agents/
 .cursor/

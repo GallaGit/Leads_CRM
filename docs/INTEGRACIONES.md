@@ -152,16 +152,22 @@ El workflow inspeccionado utiliza 3–10 empleados. El ICP estratégico document
 
 ### Webhooks
 
-Leads_CRM soporta las variables:
+Leads_CRM mapea tres automatizaciones (Settings / Automations). Las variables nuevas tienen alias legacy:
 
 ```dotenv
+N8N_BASE_URL=
+N8N_API_KEY=
+N8N_WEBHOOK_LEAD_CREATED=
+N8N_WEBHOOK_LEAD_UPDATED=
+N8N_WEBHOOK_LEAD_ANALYZED=
+# alias
 N8N_WEBHOOK_BUSCAR_LEADS=
 N8N_WEBHOOK_ANALIZAR_LEAD=
 N8N_WEBHOOK_GENERAR_EMAIL=
 N8N_WEBHOOK_EJECUTAR=
 ```
 
-La capa está preparada, pero no se añadieron triggers al workflow. No rellenes URLs hasta que existan endpoints n8n protegidos.
+La capa está preparada (`N8nClient.triggerWebhook` + métodos `notifyLeadCreated/Updated/Analyzed`), pero no se añadieron triggers al workflow. No rellenes URLs hasta que existan endpoints n8n protegidos. Settings puede guardar overrides en `data/settings.local.json` (gitignored); el navegador solo ve previews enmascarados.
 
 ## SerpAPI
 
@@ -213,11 +219,13 @@ Integraciones futuras:
 ```dotenv
 GROQ_API_KEY=
 GROQ_MODEL=openai/gpt-oss-120b
-GROQ_TEMPERATURE=1
-GROQ_MAX_COMPLETION_TOKENS=2048
-GROQ_TOP_P=1
-GROQ_REASONING_EFFORT=medium
+AI_PROVIDER=groq
 SERPAPI_API_KEY=
+N8N_BASE_URL=
+N8N_API_KEY=
+N8N_WEBHOOK_LEAD_CREATED=
+N8N_WEBHOOK_LEAD_UPDATED=
+N8N_WEBHOOK_LEAD_ANALYZED=
 N8N_WEBHOOK_BUSCAR_LEADS=
 N8N_WEBHOOK_ANALIZAR_LEAD=
 N8N_WEBHOOK_GENERAR_EMAIL=
@@ -228,6 +236,7 @@ N8N_WEBHOOK_EJECUTAR=
 
 - Mantener `.env.local` fuera de Git.
 - No usar variables `NEXT_PUBLIC_*` para tokens.
-- No mostrar valores secretos en Settings.
+- No mostrar valores secretos en Settings (solo flags y últimos 4 caracteres).
+- Los overrides de la UI se guardan en `data/settings.local.json`, fuera de Git.
 - Restringir los webhooks n8n antes de habilitarlos.
 - Mantener `AUTH_DISABLED=true` solo mientras la aplicación se use localmente.
