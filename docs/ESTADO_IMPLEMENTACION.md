@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Fecha de revisión: 2026-09-04.
+Fecha de revisión: 2026-09-04. Revisión documental 2026-09-07: el repositorio está en GitHub (`GallaGit/Leads_CRM`, rama `master`); el merge de duplicados ya está en código (ver Disponible).
 
 Este documento describe el comportamiento del código actual. No sustituye a [`DECISIONES.md`](./DECISIONES.md) ni al [`ROADMAP.md`](./ROADMAP.md).
 
@@ -138,7 +138,7 @@ Detección y fusión de duplicados (ciclos 2–3):
 
 ## Pasada Development 2026-09-04 (confirmado)
 
-Rama: `improve/dev-pass-fase6`. Sin remoto git. Business y Release fuera de alcance de esta pasada.
+Rama de aquella pasada: `improve/dev-pass-fase6`. En su momento no había remoto git. El repositorio está ahora en GitHub: [`GallaGit/Leads_CRM`](https://github.com/GallaGit/Leads_CRM) (rama `master`). Business y Release estaban fuera de alcance de esa pasada.
 
 | Ciclo | Commit | Resumen |
 |-------|--------|---------|
@@ -161,7 +161,6 @@ Detalle de la sesión: [`SESION-2026-09-04-dev-pass.md`](./SESION-2026-09-04-dev
 - tests automatizados;
 - virtualización o paginación visual para miles de filas;
 - optimización específica para móvil;
-- sin remoto git → sin merge a main ni deploy desde esta pasada;
 - cambio local sin commit en `src/lib/notion/notion-lead-repository.ts`: omite `in_trash:false` al consultar páginas activas (Notion rechaza `in_trash:false`). **PENDING** — no forma parte de los 5 commits de la pasada;
 - ítem ROADMAP Fase 6 «Timeline / comentario Notion»: trabajo previo ya reflejado en Disponible (timeline por bloques + intento de comentario); no entregado en los ciclos 1–5 de esta pasada.
 
