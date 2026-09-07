@@ -3,6 +3,12 @@ import { getLeadRepository } from "@/lib/notion/notion-lead-repository";
 import { filterLeads } from "@/lib/leads/filter-leads";
 import { validateLeadCreate } from "@/lib/leads/validate-lead";
 import type { LeadFilters, LeadStatus } from "@/lib/domain/lead";
+import {
+  changedKeys,
+  dispatchLeadCreated,
+  dispatchLeadUpdated,
+  summarizeDispatch,
+} from "@/lib/automations/dispatch";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +74,8 @@ export async function POST(request: Request) {
 
     const repo = getLeadRepository();
     const lead = await repo.create(result.value);
-    return NextResponse.json({ lead }, { status: 201 });
+    const automation = dispatchLeadCreated(lead);
+    return NextResponse.json({ lead, automation }, { status: 201 });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Error al crear el lead";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -87,10 +94,17 @@ export async function PATCH(request: Request) {
     }
     const repo = getLeadRepository();
     const updated = [];
+    const automations = [];
+    const changed = changedKeys(patch);
     for (const id of ids) {
-      updated.push(await repo.update(id, patch));
+      const lead = await repo.update(id, patch);
+      updated.push(lead);
+      automations.push(dispatchLeadUpdated(lead, changed));
     }
-    return NextResponse.json({ leads: updated });
+    return NextResponse.json({
+      leads: updated,
+      automation: summarizeDispatch(automations),
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Error en actualización masiva";
     return NextResponse.json({ error: message }, { status: 500 });

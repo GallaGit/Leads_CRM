@@ -1,28 +1,33 @@
 import { Client } from "@notionhq/client";
+import { getSettingsService } from "@/lib/settings/service";
 
 let client: Client | null = null;
+let cachedToken: string | null = null;
+
+function notionToken(): string {
+  return getSettingsService().getRaw().notion.token.value;
+}
 
 export function getNotionClient(): Client {
-  const token = process.env.NOTION_TOKEN;
+  const token = notionToken();
   if (!token) {
     throw new Error("NOTION_TOKEN no configurado");
   }
-  if (!client) {
+  if (!client || cachedToken !== token) {
     client = new Client({ auth: token });
+    cachedToken = token;
   }
   return client;
 }
 
 /** Database ID (parent). Prefer data source for queries in Notion API 2025+. */
 export function getNotionDatabaseId(): string {
-  const id =
-    process.env.NOTION_DATABASE_ID ?? "ed07cdd4c5424f9a8b8ebd73e358c6cd";
+  const id = getSettingsService().getRaw().notion.databaseId.value;
   return id.replace(/-/g, "");
 }
 
 /** Data source collection ID for Leads Asesorías Valencia */
 export function getNotionDataSourceId(): string {
-  const id =
-    process.env.NOTION_DATA_SOURCE_ID ?? "27fefc60-8dfd-4356-9465-582d3c49d99f";
+  const id = getSettingsService().getRaw().notion.dataSourceId.value;
   return id.replace(/-/g, "");
 }

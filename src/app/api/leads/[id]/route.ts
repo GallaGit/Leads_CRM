@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { getLeadRepository } from "@/lib/notion/notion-lead-repository";
 import type { LeadPatch } from "@/lib/domain/lead";
+import {
+  changedKeys,
+  dispatchLeadUpdated,
+} from "@/lib/automations/dispatch";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +32,8 @@ export async function PATCH(request: Request, ctx: Ctx) {
     const patch = (await request.json()) as LeadPatch;
     const repo = getLeadRepository();
     const lead = await repo.update(id, patch);
-    return NextResponse.json({ lead });
+    const automation = dispatchLeadUpdated(lead, changedKeys(patch));
+    return NextResponse.json({ lead, automation });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Error al actualizar lead";
     return NextResponse.json({ error: message }, { status: 500 });

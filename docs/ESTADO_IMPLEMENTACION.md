@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Fecha de revisión: 2026-09-04. Revisión documental 2026-09-07: el repositorio está en GitHub (`GallaGit/Leads_CRM`, rama `master`); el merge de duplicados ya está en código (ver Disponible).
+Fecha de revisión: 2026-09-07 (Fase 7 parcial: SettingsService + N8nClient + UI Integraciones/Automations). Revisión documental previa 2026-09-07: el repositorio está en GitHub (`GallaGit/Leads_CRM`, rama `master`); el merge de duplicados ya está en código (ver Disponible).
 
 Este documento describe el comportamiento del código actual. No sustituye a [`DECISIONES.md`](./DECISIONES.md) ni al [`ROADMAP.md`](./ROADMAP.md).
 
@@ -71,16 +71,22 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 - `POST /api/leads/merge`
 - `POST /api/leads/score`
 - `POST /api/sync`
+- `GET /api/settings`
+- `PATCH /api/settings`
 - `GET /api/settings/status`
-- `GET|POST /api/automations/:action`
+- `POST /api/settings/test`
+- `GET /api/automations`
+- `GET|PATCH|POST /api/automations/:action`
 
 ### Configuración
 
 - `.env.example`;
-- secretos solo en servidor;
-- estado de configuración sin exponer valores;
+- `SettingsService` (`src/lib/settings/`): mezcla env + `data/settings.local.json`;
+- secretos solo en servidor (flags + preview de 4 caracteres en la UI);
+- tests de conexión Notion / n8n / Groq / SerpAPI;
+- estado de conexión por integración (`never` | `syncing` | `ok` | `error`, `lastSyncedAt`);
 - auth preparada y deshabilitada en local;
-- cliente n8n preparado.
+- `N8nClient` con timeout, errores HTTP/JSON y métodos lead created/updated/analyzed.
 
 ## Parcial
 
@@ -98,11 +104,11 @@ Workbench en `/email` para revisar borradores. El mismo editor vive en el drawer
 
 ### Automations
 
-La página muestra qué webhooks están configurados. El cliente servidor puede ejecutarlos, pero el workflow actual no tiene los triggers correspondientes.
+Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL de webhook enmascarada, activa/inactiva y botón **Probar**. Tras persistir en Notion, el alta (`POST /api/leads`) y las actualizaciones (`PATCH` individual y masiva; fusión si rellena campos) disparan el webhook correspondiente en segundo plano si el toggle está activo y hay URL. Un fallo de n8n se registra y no revierte el lead. `notifyLeadAnalyzed` sigue sin ciclo de vida (no hay acción de dolores IA).
 
 ### Settings
 
-Muestra el estado de configuración. No permite editar secretos desde la UI, por diseño.
+Integraciones editables (Notion, n8n, IA/Groq, SerpAPI) con secretos enmascarados, Guardar y Probar conexión. Persistencia en archivo local gitignored; `.env.local` sigue siendo el arranque.
 
 ### Actividad
 
@@ -156,7 +162,6 @@ Detalle de la sesión: [`SESION-2026-09-04-dev-pass.md`](./SESION-2026-09-04-dev
 
 - acción **Detectar dolores del negocio**;
 - persistencia/visualización estructurada del análisis IA;
-- ejecución completa de automatizaciones desde UI;
 - autenticación real y pantalla de login;
 - tests automatizados;
 - virtualización o paginación visual para miles de filas;

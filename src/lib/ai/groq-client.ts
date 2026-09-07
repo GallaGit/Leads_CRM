@@ -3,6 +3,7 @@ import type {
   ChatCompletionCreateParamsBase,
   ChatCompletionMessageParam,
 } from "groq-sdk/resources/chat/completions";
+import { getSettingsService } from "@/lib/settings/service";
 
 type ReasoningEffort = "low" | "medium" | "high";
 
@@ -14,6 +15,7 @@ export type GroqCompletionOptions = Partial<
 >;
 
 let client: Groq | null = null;
+let cachedKey: string | null = null;
 
 function envNumber(name: string, fallback: number): number {
   const value = Number(process.env[name]);
@@ -25,9 +27,15 @@ function reasoningEffort(): ReasoningEffort {
   return value === "low" || value === "high" ? value : "medium";
 }
 
+function groqApiKey(): string {
+  return getSettingsService().getRaw().ai.apiKey.value;
+}
+
 function completionDefaults() {
+  const model =
+    getSettingsService().getRaw().ai.model.value || "openai/gpt-oss-120b";
   return {
-    model: process.env.GROQ_MODEL?.trim() || "openai/gpt-oss-120b",
+    model,
     temperature: envNumber("GROQ_TEMPERATURE", 1),
     max_completion_tokens: envNumber("GROQ_MAX_COMPLETION_TOKENS", 2048),
     top_p: envNumber("GROQ_TOP_P", 1),
@@ -37,11 +45,14 @@ function completionDefaults() {
 }
 
 export function getGroqClient(): Groq {
-  const apiKey = process.env.GROQ_API_KEY?.trim();
+  const apiKey = groqApiKey();
   if (!apiKey) {
     throw new Error("GROQ_API_KEY no configurado");
   }
-  client ??= new Groq({ apiKey });
+  if (!client || cachedKey !== apiKey) {
+    client = new Groq({ apiKey });
+    cachedKey = apiKey;
+  }
   return client;
 }
 

@@ -26,6 +26,7 @@ import {
 } from "@/lib/leads/validate-lead";
 import { useUiStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
+import { toastAutomationDispatch } from "@/components/automations/toast-dispatch";
 
 const emptyForm: LeadCreateInput = {
   companyName: "",
@@ -159,6 +160,7 @@ export function CreateLeadDialog() {
       upsertLead(lead);
       setSelectedLeadId(lead.id);
       toast.success(`Lead creado: ${lead.companyName}`);
+      toastAutomationDispatch(data.automation);
       setOpen(false);
       reset();
     } catch (err) {

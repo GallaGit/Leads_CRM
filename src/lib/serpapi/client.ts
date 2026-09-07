@@ -1,3 +1,5 @@
+import { getSettingsService } from "@/lib/settings/service";
+
 const SERPAPI_ENDPOINT = "https://serpapi.com/search.json";
 
 export type SerpApiParams = Record<
@@ -9,7 +11,7 @@ export async function searchSerpApi<T>(
   params: SerpApiParams,
   signal?: AbortSignal,
 ): Promise<T> {
-  const apiKey = process.env.SERPAPI_API_KEY?.trim();
+  const apiKey = getSettingsService().getRaw().serpapi.apiKey.value;
   if (!apiKey) {
     throw new Error("SERPAPI_API_KEY no configurado");
   }
