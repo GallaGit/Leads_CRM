@@ -241,7 +241,7 @@ En `/automations` hay tres eventos: Nuevo Lead, Lead actualizado y Lead analizad
 
 - Activa o desactiva cada uno.
 - Pega la URL del webhook (o déjala en `.env`).
-- **Probar** envía un payload de ejemplo. El workflow n8n actual no incluye estos triggers.
+- **Probar** envía un payload de ejemplo. Si el toggle está **Activa** y hay webhook, el alta y las ediciones de leads también disparan el evento (best-effort; un error de n8n no impide guardar en Notion). El workflow n8n actual no incluye estos triggers.
 
 ## Tema
 
@@ -249,7 +249,7 @@ El botón de la esquina superior cambia entre tema claro y oscuro. El diseño es
 
 ## Estado de las demás secciones
 
-Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations configura y prueba webhooks n8n; el workflow n8n no incluye esos triggers y el análisis IA de dolores sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
+Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations configura webhooks n8n y, si están activos, la app los dispara en alta/edición (best-effort). El workflow n8n no incluye esos triggers y el análisis IA de dolores sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
 
 ## Diagnóstico rápido
 

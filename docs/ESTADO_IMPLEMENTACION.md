@@ -104,7 +104,7 @@ Workbench en `/email` para revisar borradores. El mismo editor vive en el drawer
 
 ### Automations
 
-Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL de webhook enmascarada, activa/inactiva y botón **Probar** (payload de ejemplo vía `N8nClient`). Los disparos automáticos en alta/edición de leads todavía no están cableados.
+Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL de webhook enmascarada, activa/inactiva y botón **Probar**. Tras persistir en Notion, el alta (`POST /api/leads`) y las actualizaciones (`PATCH` individual y masiva; fusión si rellena campos) disparan el webhook correspondiente en segundo plano si el toggle está activo y hay URL. Un fallo de n8n se registra y no revierte el lead. `notifyLeadAnalyzed` sigue sin ciclo de vida (no hay acción de dolores IA).
 
 ### Settings
 
@@ -162,7 +162,6 @@ Detalle de la sesión: [`SESION-2026-09-04-dev-pass.md`](./SESION-2026-09-04-dev
 
 - acción **Detectar dolores del negocio**;
 - persistencia/visualización estructurada del análisis IA;
-- disparo automático de webhooks n8n en el ciclo de vida del lead (hoy solo test manual desde Automations);
 - autenticación real y pantalla de login;
 - tests automatizados;
 - virtualización o paginación visual para miles de filas;

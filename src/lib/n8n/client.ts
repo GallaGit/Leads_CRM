@@ -42,6 +42,17 @@ export interface AutomationClient {
     urlOrAction: string,
     payload?: Record<string, unknown>,
   ): Promise<WebhookTriggerResult>;
+  notifyLeadCreated(
+    lead: Record<string, unknown>,
+  ): Promise<WebhookTriggerResult>;
+  notifyLeadUpdated(
+    lead: Record<string, unknown>,
+    changed?: string[],
+  ): Promise<WebhookTriggerResult>;
+  notifyLeadAnalyzed(
+    lead: Record<string, unknown>,
+    analysis?: Record<string, unknown>,
+  ): Promise<WebhookTriggerResult>;
 }
 
 export interface N8nClientDeps {
@@ -300,7 +311,17 @@ export class N8nClient implements AutomationClient {
       return {
         ok: true,
         status: 0,
-        body: { skipped: true, action },
+        body: { skipped: true, action, reason: "inactive" },
+        skipped: true,
+        durationMs: 0,
+      };
+    }
+    if (!settings.n8n.webhooks[action].value) {
+      this.logger.info("[n8n] skip (sin webhook)", { action });
+      return {
+        ok: true,
+        status: 0,
+        body: { skipped: true, action, reason: "not_configured" },
         skipped: true,
         durationMs: 0,
       };

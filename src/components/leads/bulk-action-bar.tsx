@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/domain/lead";
 import { useUiStore } from "@/store/ui-store";
+import { toastAutomationBulk } from "@/components/automations/toast-dispatch";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export function BulkActionBar() {
       if (!res.ok) throw new Error(data.error || "Error masivo");
       for (const lead of data.leads as Lead[]) upsertLead(lead);
       toast.success(`${data.leads.length} leads actualizados`);
+      toastAutomationBulk(data.automation);
       setSelectedIds([]);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");

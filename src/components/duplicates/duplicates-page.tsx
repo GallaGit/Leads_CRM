@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { Lead } from "@/lib/domain/lead";
+import { toastAutomationDispatch } from "@/components/automations/toast-dispatch";
 import type {
   DuplicateGroup,
   DuplicateLeadRef,
@@ -208,6 +209,7 @@ export function DuplicatesPage() {
           ? `Fusionado: ${n} campo${n === 1 ? "" : "s"} rellenado${n === 1 ? "" : "s"}`
           : "Fusionado: sin campos vacíos que rellenar; origen archivado",
       );
+      toastAutomationDispatch(body.automation);
       setConfirm(null);
       clearPair();
       await refreshGroups();

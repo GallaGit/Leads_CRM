@@ -106,7 +106,7 @@ Acciones internas (con alias de env legacy):
 - `lead_updated` (Lead actualizado) — `N8N_WEBHOOK_LEAD_UPDATED`, alias `N8N_WEBHOOK_EJECUTAR` / `N8N_WEBHOOK_GENERAR_EMAIL`
 - `lead_analyzed` (Lead analizado) — `N8N_WEBHOOK_LEAD_ANALYZED`, alias `N8N_WEBHOOK_ANALIZAR_LEAD`
 
-El cliente es HTTP puro: timeout, errores HTTP, JSON inválido y logs (sin URL completa). No contiene lógica de negocio. Leads_CRM no modifica el workflow n8n.
+El cliente es HTTP puro: timeout, errores HTTP, JSON inválido y logs (sin URL completa). No contiene lógica de negocio. Tras un alta o un PATCH exitoso en Notion, `dispatchLeadCreated` / `dispatchLeadUpdated` llaman a n8n en segundo plano si la automatización está activa; un error de webhook no falla la persistencia. Leads_CRM no modifica el workflow n8n.
 
 ### Autenticación
 

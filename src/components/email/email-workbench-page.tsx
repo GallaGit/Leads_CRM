@@ -9,6 +9,7 @@ import type { Lead } from "@/lib/domain/lead";
 import { outreachV1 } from "@/lib/templates/outreach-v1";
 import { pickLeadEmail } from "@/lib/utils/gmail-compose";
 import { useUiStore } from "@/store/ui-store";
+import { toastAutomationDispatch } from "@/components/automations/toast-dispatch";
 
 function hasDraft(lead: Lead): boolean {
   return (
@@ -113,6 +114,7 @@ function EmailDraftPanel({
       if (!res.ok) throw new Error(data.error || "Error al guardar");
       upsertLead(data.lead);
       toast.success("Guardado");
+      toastAutomationDispatch(data.automation);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");
     } finally {

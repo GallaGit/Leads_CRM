@@ -29,6 +29,7 @@ import {
 } from "@/lib/utils/email-plain";
 import { pickLeadEmail } from "@/lib/utils/gmail-compose";
 import { statusColor, useUiStore } from "@/store/ui-store";
+import { toastAutomationDispatch } from "@/components/automations/toast-dispatch";
 
 function copy(text: string, label: string) {
   void navigator.clipboard.writeText(text);
@@ -122,6 +123,7 @@ function LeadDrawerBody({
       setLead(data.lead);
       upsertLead(data.lead);
       toast.success("Guardado");
+      toastAutomationDispatch(data.automation);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");
     } finally {
