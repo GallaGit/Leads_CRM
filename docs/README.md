@@ -6,7 +6,7 @@ Este directorio reúne la documentación funcional y técnica de Leads_CRM, la a
 
 1. [`CONTEXTO_NEGOCIO.md`](./CONTEXTO_NEGOCIO.md): por qué existe el producto, cliente ideal, propuesta de valor y flujo comercial.
 2. [`DECISIONES.md`](./DECISIONES.md): decisiones de producto vigentes y no negociables.
-3. [`GUIA_USO.md`](./GUIA_USO.md): instalación, configuración local y operación diaria.
+3. [`GUIA_USO.md`](./GUIA_USO.md): instalación, configuración local y operación diaria. Docker Desktop está documentado en el [README](../README.md#docker) de la raíz.
 4. [`ARQUITECTURA.md`](./ARQUITECTURA.md): estructura del sistema, capas, flujos y límites.
 5. [`INTEGRACIONES.md`](./INTEGRACIONES.md): Notion, n8n, SerpAPI y configuración segura.
 6. [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md): funcionalidades disponibles, limitaciones y deuda conocida.

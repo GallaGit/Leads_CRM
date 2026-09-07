@@ -19,5 +19,8 @@ services:
       # Avast SSL scanning MITM — export with: powershell -File scripts/export-avast-ca.ps1
       NODE_EXTRA_CA_CERTS: /certs/avast-web-mail-shield-root.pem
     volumes:
-      - ./certs/avast-web-mail-shield-root.pem:/certs/avast-web-mail-shield-root.pem:ro
+      # Mount the directory, not the PEM file. A missing file bind makes Docker
+      # create a host *directory* with the PEM name, then runc fails with
+      # "not a directory". Recreate the container after moving the project.
+      - ./certs:/certs:ro
     restart: unless-stopped
