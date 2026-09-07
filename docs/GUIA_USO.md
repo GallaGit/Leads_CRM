@@ -203,6 +203,17 @@ El drawer permite:
 
 La acción está disponible para un lead individual y para una selección.
 
+### Duplicados
+
+En `/duplicates` se listan grupos con el mismo email, teléfono o dominio web (también nombre o dirección normalizados; incluye archivados). Daily Work enlaza la cola de posibles duplicados hacia Leads; la fusión se hace aquí.
+
+1. Elige un lead para **Conservar** y otro para **Archivar**.
+2. Compara los campos lado a lado.
+3. **Fusionar** rellena solo los campos vacíos del lead conservado y archiva el otro. Nunca sobrescribe valores existentes. Requiere confirmación.
+4. **Solo archivar origen** archiva el lead marcado sin copiar campos.
+
+Al fusionar o archivar, la lista de grupos se actualiza.
+
 ## Operaciones masivas
 
 1. Selecciona una o más filas.
@@ -220,7 +231,7 @@ El botón de la esquina superior cambia entre tema claro y oscuro. El diseño es
 
 ## Estado de las demás secciones
 
-Las rutas de Statistics, Automations y Duplicados existen en la navegación; Statistics y la UI de merge de duplicados siguen pendientes. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
+Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Automations muestra qué webhooks están configurados; la ejecución completa desde la UI sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
 
 ## Diagnóstico rápido
 
