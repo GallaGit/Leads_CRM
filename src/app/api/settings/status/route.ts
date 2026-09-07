@@ -13,7 +13,7 @@ export async function GET() {
       notionConfigured: settings.notion.configured,
       serpapiConfigured: settings.serpapi.configured,
       groqConfigured: settings.ai.configured,
-      n8n: settings.automations.map((a) => ({
+      n8nActions: settings.automations.map((a) => ({
         action: a.action,
         configured: a.webhook.configured,
         enabled: a.enabled,

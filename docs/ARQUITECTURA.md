@@ -203,7 +203,7 @@ Solo filtros y visibilidad de columnas se persisten en `localStorage`. Notion si
 - `POST /api/sync`: recupera todos los leads activos.
 - `GET /api/settings`: configuración pública (enmascarada).
 - `PATCH /api/settings`: guarda overrides en `data/settings.local.json`.
-- `GET /api/settings/status`: igual que GET settings más campos de compatibilidad.
+- `GET /api/settings/status`: igual que GET settings más flags de compatibilidad (`notionConfigured`, `n8nActions`, …).
 - `POST /api/settings/test`: prueba una integración (`notion` | `n8n` | `ai` | `serpapi`) sin devolver secretos.
 - `GET /api/automations`: lista automatizaciones (nombre, descripción, activa, webhook enmascarado).
 - `GET|PATCH /api/automations/:action`: lee o actualiza toggle/URL.

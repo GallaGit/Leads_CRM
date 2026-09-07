@@ -74,7 +74,14 @@ export function AutomationsPanel() {
         status?: number;
         error?: string;
       };
-      if (!res.ok) throw new Error(data.error || "La prueba falló");
+      if (!res.ok) {
+        throw new Error(
+          data.error ||
+            (typeof data.status === "number"
+              ? `Webhook HTTP ${data.status}`
+              : "La prueba falló"),
+        );
+      }
       toast.success(`Webhook respondió HTTP ${data.status ?? 200}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al probar");

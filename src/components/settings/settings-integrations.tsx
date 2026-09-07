@@ -53,7 +53,7 @@ function optionalSecret(value: string): string | undefined {
 }
 
 async function fetchPublicSettings(): Promise<PublicSettings> {
-  const res = await fetch("/api/settings/status");
+  const res = await fetch("/api/settings");
   const data = (await res.json()) as PublicSettings & { error?: string };
   if (!res.ok) throw new Error(data.error || "No se pudo cargar Settings");
   return data;
