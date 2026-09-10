@@ -11,6 +11,8 @@ import {
   Copy,
   Star,
   Trash2,
+  ScanSearch,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmailEditor } from "@/components/leads/email-editor";
+import { AiAnalysisPanel } from "@/components/leads/ai-analysis-panel";
+import { resolvePainAnalysis } from "@/lib/ai/pain-analysis";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/domain/lead";
 import {
   OBSERVACIONES_SOFT_LIMIT,
@@ -30,6 +34,35 @@ import {
 import { pickLeadEmail } from "@/lib/utils/gmail-compose";
 import { statusColor, useUiStore } from "@/store/ui-store";
 import { toastAutomationDispatch } from "@/components/automations/toast-dispatch";
+
+function isGenericNetworkError(message: string): boolean {
+  return /failed to fetch|network|timeout|aborterror/i.test(message);
+}
+
+type AnalyzeResponse = {
+  error?: unknown;
+  code?: unknown;
+  lead?: Lead;
+  analysis?: unknown;
+  activity?: { at: string; type: string; message: string }[];
+  empty?: boolean;
+  notionUpdated?: boolean;
+  automation?: Parameters<typeof toastAutomationDispatch>[0];
+};
+
+function analyzeErrorMessage(data: {
+  error?: unknown;
+  code?: unknown;
+}): string {
+  if (data.error && typeof data.error === "object") {
+    const err = data.error as { message?: unknown; code?: unknown };
+    if (typeof err.message === "string" && err.message.trim()) {
+      return err.message;
+    }
+  }
+  if (typeof data.error === "string" && data.error.trim()) return data.error;
+  return "Error al analizar";
+}
 
 function copy(text: string, label: string) {
   void navigator.clipboard.writeText(text);
@@ -83,6 +116,10 @@ function LeadDrawerBody({
   const [loading, setLoading] = useState(true);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+  const [analyzeEmpty, setAnalyzeEmpty] = useState(false);
+  const [apiAnalysis, setApiAnalysis] = useState<unknown>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,6 +135,9 @@ function LeadDrawerBody({
         setEmailSubject(data.lead.emailSubject ?? "");
         setEmailBody(data.lead.emailBody ?? "");
         setActivity(data.activity ?? []);
+        setApiAnalysis(null);
+        setAnalyzeEmpty(false);
+        setAnalyzeError(null);
         upsertLead(data.lead);
       })
       .catch((e) => toast.error(e.message))
@@ -128,6 +168,76 @@ function LeadDrawerBody({
       toast.error(e instanceof Error ? e.message : "Error");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function detectPains(force = false) {
+    if (!lead || analyzing || loading) return;
+    const previous = lead;
+    setAnalyzing(true);
+    setAnalyzeError(null);
+    setAnalyzeEmpty(false);
+    try {
+      const res = await fetch(`/api/leads/${previous.id}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force }),
+      });
+      const data = (await res.json()) as AnalyzeResponse;
+      if (!res.ok) {
+        const message = analyzeErrorMessage(data);
+        setAnalyzeError(message);
+        setLead(previous);
+        if (isGenericNetworkError(message)) {
+          toast.error("No se pudo detectar dolores.");
+        }
+        return;
+      }
+      if (data.lead) {
+        setLead(data.lead);
+        upsertLead(data.lead);
+      }
+      setApiAnalysis(data.analysis ?? null);
+      if (Array.isArray(data.activity)) {
+        setActivity(data.activity);
+      } else if (data.lead?.id) {
+        void refreshActivity(data.lead.id);
+      }
+      const resolved = resolvePainAnalysis(
+        data.analysis,
+        data.lead?.aiAnalysis ?? previous.aiAnalysis,
+      );
+      if (data.empty || !resolved) {
+        setAnalyzeEmpty(true);
+        return;
+      }
+      setAnalyzeEmpty(false);
+      if (data.notionUpdated) {
+        toast.success("Análisis guardado");
+      }
+      toastAutomationDispatch(data.automation);
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : "Error al detectar dolores";
+      setAnalyzeError(message);
+      setLead(previous);
+      if (isGenericNetworkError(message)) {
+        toast.error("No se pudo detectar dolores.");
+      }
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  async function refreshActivity(id: string) {
+    try {
+      const res = await fetch(`/api/leads/${id}`);
+      const data = (await res.json()) as { activity?: typeof activity };
+      if (res.ok && Array.isArray(data.activity)) {
+        setActivity(data.activity);
+      }
+    } catch {
+      // best-effort
     }
   }
 
@@ -165,6 +275,75 @@ function LeadDrawerBody({
           </Button>
         </div>
 
+        {lead ? (
+          <div className="flex shrink-0 flex-wrap gap-1 border-b border-[var(--border)] px-3 py-2">
+            {lead.website && (
+              <Action href={lead.website} icon={ExternalLink} tip="Web" />
+            )}
+            {lead.linkedin && (
+              <Action href={lead.linkedin} icon={Link2} tip="LinkedIn" />
+            )}
+            {mapsUrl && (
+              <Action href={mapsUrl} icon={MapPin} tip="Google Maps" />
+            )}
+            {lead.email && (
+              <Action href={`mailto:${lead.email}`} icon={Mail} tip="Email" />
+            )}
+            {lead.email && (
+              <Button
+                variant="outline"
+                size="icon"
+                title="Copiar email"
+                onClick={() => copy(lead.email!, "Email")}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            {lead.phone && (
+              <Button
+                variant="outline"
+                size="icon"
+                title="Copiar teléfono"
+                onClick={() => copy(lead.phone!, "Teléfono")}
+              >
+                <Phone className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              title="Favorito"
+              onClick={() => savePatch({ favorite: !lead.favorite })}
+            >
+              <Star
+                className={`h-3.5 w-3.5 ${lead.favorite ? "fill-amber-400 text-amber-400" : ""}`}
+              />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
+              disabled={analyzing || loading}
+              onClick={() => void detectPains()}
+            >
+              {analyzing ? (
+                <Loader2 className="h-[18px] w-[18px] animate-spin" />
+              ) : (
+                <ScanSearch className="h-[18px] w-[18px]" />
+              )}
+              {analyzing ? "Detectando…" : "Detectar dolores"}
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              title="Archivar"
+              onClick={() => setConfirmArchive(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5 text-red-400" />
+            </Button>
+          </div>
+        ) : null}
+
         {loading && !lead ? (
           <div className="space-y-3 p-4">
             {[1, 2, 3, 4].map((i) => (
@@ -176,67 +355,6 @@ function LeadDrawerBody({
           </div>
         ) : lead ? (
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4">
-            <div className="flex flex-wrap gap-1">
-              {lead.website && (
-                <Action
-                  href={lead.website}
-                  icon={ExternalLink}
-                  tip="Web"
-                />
-              )}
-              {lead.linkedin && (
-                <Action href={lead.linkedin} icon={Link2} tip="LinkedIn" />
-              )}
-              {mapsUrl && (
-                <Action href={mapsUrl} icon={MapPin} tip="Google Maps" />
-              )}
-              {lead.email && (
-                <Action
-                  href={`mailto:${lead.email}`}
-                  icon={Mail}
-                  tip="Email"
-                />
-              )}
-              {lead.email && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  title="Copiar email"
-                  onClick={() => copy(lead.email!, "Email")}
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </Button>
-              )}
-              {lead.phone && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  title="Copiar teléfono"
-                  onClick={() => copy(lead.phone!, "Teléfono")}
-                >
-                  <Phone className="h-3.5 w-3.5" />
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="icon"
-                title="Favorito"
-                onClick={() => savePatch({ favorite: !lead.favorite })}
-              >
-                <Star
-                  className={`h-3.5 w-3.5 ${lead.favorite ? "fill-amber-400 text-amber-400" : ""}`}
-                />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                title="Archivar"
-                onClick={() => setConfirmArchive(true)}
-              >
-                <Trash2 className="h-3.5 w-3.5 text-red-400" />
-              </Button>
-            </div>
-
             <Section title="Empresa">
               <Field label="Nombre" value={lead.companyName} />
               <Field label="Web" value={lead.website} />
@@ -297,6 +415,14 @@ function LeadDrawerBody({
               />
             </Section>
 
+            <AiAnalysisPanel
+              analyzing={analyzing}
+              error={analyzeError}
+              empty={analyzeEmpty}
+              analysis={resolvePainAnalysis(apiAnalysis, lead.aiAnalysis)}
+              onRetry={() => void detectPains(true)}
+            />
+
             <Section title="Notas">
               <Textarea
                 value={notes}
@@ -345,14 +471,6 @@ function LeadDrawerBody({
                 }
               />
             </Section>
-
-            {lead.aiAnalysis && (
-              <Section title="Análisis IA">
-                <pre className="whitespace-pre-wrap text-[12px] text-[var(--muted-fg)]">
-                  {lead.aiAnalysis}
-                </pre>
-              </Section>
-            )}
 
             <Section title="Actividad">
               {activity.length === 0 ? (

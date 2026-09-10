@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Fecha de revisión: 2026-09-10 (alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; filtro 3–10 operativo; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07 (Fase 7 parcial: SettingsService + N8nClient + UI Integraciones/Automations). El repositorio está en GitHub (`GallaGit/Leads_CRM`, rama `master`); el merge de duplicados ya está en código (ver Disponible).
+Fecha de revisión: 2026-09-10 (Fase 7: Detectar dolores IA + persistencia `Análisis IA`; alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07: SettingsService + N8nClient + UI Integraciones/Automations. El repositorio está en GitHub (`GallaGit/Leads_CRM`).
 
 Este documento describe el comportamiento del código actual. No sustituye a [`DECISIONES.md`](./DECISIONES.md) ni al [`ROADMAP.md`](./ROADMAP.md).
 
@@ -55,6 +55,7 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 - edición de notas;
 - edición y copia de email en texto plano;
 - favorito;
+- **Detectar dolores** en el drawer (Groq → `Análisis IA` con Evidencia / Inferencia / Especulación);
 - archivo con confirmación;
 - enlaces externos a web, LinkedIn, Google Maps y cliente de email;
 - deep-link mediante `/leads?lead=<id>`.
@@ -67,6 +68,8 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 - `GET /api/leads/:id`
 - `PATCH /api/leads/:id`
 - `DELETE /api/leads/:id`
+- `POST /api/leads/:id/analyze`
+- `POST /api/leads/pain-analysis` *(alias)*
 - `GET /api/leads/duplicates`
 - `POST /api/leads/merge`
 - `POST /api/leads/score`
@@ -88,6 +91,17 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 - auth preparada y deshabilitada en local;
 - `N8nClient` con timeout, errores HTTP/JSON y métodos lead created/updated/analyzed.
 
+### Detectar dolores (Fase 7)
+
+- botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar);
+- sección **Dolores** (`ai-analysis-panel.tsx`) debajo de CRM;
+- `POST /api/leads/:id/analyze` (drawer Front) y `POST /api/leads/pain-analysis` (contrato Grok: `{ id?, lead?, persist? }`) llaman a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escriben Notion `Análisis IA` (rich_text) si persist;
+- contrato: `docs/CONTRACT-pain-analysis.md` — Evidencia / Inferencia / Especulación; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
+- salida estructurada **Evidencia / Inferencia / Especulación** (`src/lib/ai/pain-analysis.ts`); la UI muestra tres bloques, no un `<pre>` crudo;
+- re-ejecutar está permitido y sobrescribe el análisis; sin confirmación en v1;
+- un fallo de Groq no modifica el lead; actividad (`ai_analyzed`) y comentario Notion en best-effort como el resto de acciones;
+- si *Lead analizado* está activo, `dispatchLeadAnalyzed` → `notifyLeadAnalyzed` en segundo plano.
+
 ## Parcial
 
 ### Dashboard
@@ -104,7 +118,7 @@ Workbench en `/email` para revisar borradores. El mismo editor vive en el drawer
 
 ### Automations
 
-Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL enmascarada y botón **Probar**. La capa dispara en segundo plano tras alta/PATCH **si** hay toggle activo y URL; en v1 no hay triggers en el workflow ni URLs configuradas (decisión #12). Un fallo de n8n no revierte el lead. `notifyLeadAnalyzed` sin ciclo de vida (no hay acción de dolores IA).
+Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL de webhook enmascarada, activa/inactiva y botón **Probar**. Tras persistir en Notion, el alta (`POST /api/leads`), las actualizaciones (`PATCH` individual y masiva; fusión si rellena campos) y **Detectar dolores** (`POST /api/leads/:id/analyze` → `notifyLeadAnalyzed`) disparan el webhook correspondiente en segundo plano si el toggle está activo y hay URL. En v1 no hay triggers en el workflow ni URLs configuradas (decisión #12). Un fallo de n8n se registra y no revierte el lead. Un fallo de Groq no escribe `Análisis IA`.
 
 ### Settings
 
@@ -112,7 +126,7 @@ Integraciones editables (Notion, n8n, IA/Groq, SerpAPI) con secretos enmascarado
 
 ### Actividad
 
-Estado, notas, email y archivo generan eventos. No todas las posibles ediciones del modelo tienen una categoría de actividad específica.
+Estado, notas, email, archivo y análisis IA (`ai_analyzed`) generan eventos. No todas las posibles ediciones del modelo tienen una categoría de actividad específica.
 
 ### Archivo y duplicados
 
@@ -160,8 +174,6 @@ Detalle de la sesión: [`SESION-2026-09-04-dev-pass.md`](./SESION-2026-09-04-dev
 
 ## Pendiente
 
-- acción **Detectar dolores del negocio**;
-- persistencia/visualización estructurada del análisis IA;
 - autenticación real y pantalla de login;
 - tests automatizados;
 - virtualización o paginación visual para miles de filas;

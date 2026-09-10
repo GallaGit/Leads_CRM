@@ -77,6 +77,21 @@ export function dispatchLeadUpdated(
   return result;
 }
 
+export function dispatchLeadAnalyzed(
+  lead: Lead,
+  analysis: Record<string, unknown> = {},
+): AutomationDispatchResult {
+  const result = preview("lead_analyzed");
+  if (result.status === "skipped") return result;
+  const client = getAutomationClient();
+  fireAndForget(
+    "lead_analyzed",
+    lead.id,
+    client.notifyLeadAnalyzed(leadWebhookPayload(lead), analysis),
+  );
+  return result;
+}
+
 export function changedKeys(patch: object): string[] {
   return Object.keys(patch).filter((key) => {
     const value = (patch as Record<string, unknown>)[key];
