@@ -100,7 +100,7 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 - contrato: `docs/CONTRACT-pain-analysis.md` — Evidencia / Inferencia / Especulación; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
 - salida estructurada **Evidencia / Inferencia / Especulación** (`src/lib/ai/pain-analysis.ts`); la UI muestra tres bloques, no un `<pre>` crudo;
 - re-ejecutar está permitido y sobrescribe el análisis; sin confirmación en v1;
-- un fallo de Groq no modifica el lead; actividad (`ai_analyzed`) y comentario Notion en best-effort como el resto de acciones;
+- un fallo de Groq no modifica el lead; actividad (`ai_analyzed`, no `ai_analysis`) y comentario Notion en best-effort como el resto de acciones;
 - si *Lead analizado* está activo, `dispatchLeadAnalyzed` → `notifyLeadAnalyzed` en segundo plano.
 
 ## Parcial
