@@ -1,3 +1,8 @@
+/**
+ * Client-safe parse/format. Groq `analyzeBusinessPains` is in
+ * `analyze-lead-pains.ts` (server-only + createGroqCompletion) so the drawer
+ * can import this file.
+ */
 import type { Lead } from "@/lib/domain/lead";
 
 export const PAIN_SECTION_LABELS = {
@@ -173,10 +178,14 @@ export function buildLeadFacts(lead: Lead): string {
 }
 
 function cleanItems(items: unknown): string[] {
-  if (!Array.isArray(items)) return [];
+  const list = Array.isArray(items)
+    ? items
+    : typeof items === "string"
+      ? items.split(/\n+/)
+      : [];
   const seen = new Set<string>();
   const out: string[] = [];
-  for (const item of items) {
+  for (const item of list) {
     if (typeof item !== "string") continue;
     const text = item.replace(/^[•\-–—*]\s+/, "").trim();
     if (!text || text === "—") continue;
