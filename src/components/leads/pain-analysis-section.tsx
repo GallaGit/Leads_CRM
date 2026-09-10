@@ -25,7 +25,7 @@ export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
                 {PAIN_SECTION_LABELS[key]}
               </h4>
               {key === "speculation" ? (
-                <span className="text-[10px] text-[var(--muted-fg)]">
+                <span className="rounded border border-[var(--border)] px-1 py-px text-[10px] leading-none text-[var(--muted-fg)]">
                   hipótesis
                 </span>
               ) : null}
@@ -52,21 +52,13 @@ export function PainAnalysisSkeletons() {
   return (
     <div className="divide-y divide-[var(--border)]">
       {SECTION_ORDER.map((key) => (
-        <div key={key} className="py-2">
+        <div key={key} className="flex h-12 flex-col justify-center">
           <h4 className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)] opacity-60">
             {PAIN_SECTION_LABELS[key]}
           </h4>
-          <div className="mt-2 h-12 animate-pulse rounded bg-[var(--muted)]" />
+          <div className="mt-1 h-4 animate-pulse rounded bg-[var(--muted)]" />
         </div>
       ))}
     </div>
-  );
-}
-
-export function PainAnalysisFallback({ text }: { text: string }) {
-  return (
-    <p className="whitespace-pre-wrap break-words text-[12.5px] text-[var(--fg)]">
-      {text}
-    </p>
   );
 }

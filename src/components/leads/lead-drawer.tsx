@@ -50,14 +50,6 @@ type AnalyzeResponse = {
   automation?: Parameters<typeof toastAutomationDispatch>[0];
 };
 
-function isAiError(data: { error?: unknown; code?: unknown }): boolean {
-  if (data.code === "ai_error") return true;
-  if (data.error && typeof data.error === "object") {
-    return (data.error as { code?: unknown }).code === "ai_error";
-  }
-  return false;
-}
-
 function analyzeErrorMessage(data: {
   error?: unknown;
   code?: unknown;
@@ -196,7 +188,7 @@ function LeadDrawerBody({
         const message = analyzeErrorMessage(data);
         setAnalyzeError(message);
         setLead(previous);
-        if (isAiError(data) || isGenericNetworkError(message)) {
+        if (isGenericNetworkError(message)) {
           toast.error("No se pudo detectar dolores.");
         }
         return;
@@ -229,7 +221,9 @@ function LeadDrawerBody({
         e instanceof Error ? e.message : "Error al detectar dolores";
       setAnalyzeError(message);
       setLead(previous);
-      toast.error("No se pudo detectar dolores.");
+      if (isGenericNetworkError(message)) {
+        toast.error("No se pudo detectar dolores.");
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -281,6 +275,75 @@ function LeadDrawerBody({
           </Button>
         </div>
 
+        {lead ? (
+          <div className="flex shrink-0 flex-wrap gap-1 border-b border-[var(--border)] px-3 py-2">
+            {lead.website && (
+              <Action href={lead.website} icon={ExternalLink} tip="Web" />
+            )}
+            {lead.linkedin && (
+              <Action href={lead.linkedin} icon={Link2} tip="LinkedIn" />
+            )}
+            {mapsUrl && (
+              <Action href={mapsUrl} icon={MapPin} tip="Google Maps" />
+            )}
+            {lead.email && (
+              <Action href={`mailto:${lead.email}`} icon={Mail} tip="Email" />
+            )}
+            {lead.email && (
+              <Button
+                variant="outline"
+                size="icon"
+                title="Copiar email"
+                onClick={() => copy(lead.email!, "Email")}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            {lead.phone && (
+              <Button
+                variant="outline"
+                size="icon"
+                title="Copiar teléfono"
+                onClick={() => copy(lead.phone!, "Teléfono")}
+              >
+                <Phone className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              title="Favorito"
+              onClick={() => savePatch({ favorite: !lead.favorite })}
+            >
+              <Star
+                className={`h-3.5 w-3.5 ${lead.favorite ? "fill-amber-400 text-amber-400" : ""}`}
+              />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
+              disabled={analyzing || loading}
+              onClick={() => void detectPains()}
+            >
+              {analyzing ? (
+                <Loader2 className="h-[18px] w-[18px] animate-spin" />
+              ) : (
+                <ScanSearch className="h-[18px] w-[18px]" />
+              )}
+              {analyzing ? "Detectando…" : "Detectar dolores"}
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              title="Archivar"
+              onClick={() => setConfirmArchive(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5 text-red-400" />
+            </Button>
+          </div>
+        ) : null}
+
         {loading && !lead ? (
           <div className="space-y-3 p-4">
             {[1, 2, 3, 4].map((i) => (
@@ -292,81 +355,6 @@ function LeadDrawerBody({
           </div>
         ) : lead ? (
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4">
-            <div className="flex flex-wrap gap-1">
-              {lead.website && (
-                <Action
-                  href={lead.website}
-                  icon={ExternalLink}
-                  tip="Web"
-                />
-              )}
-              {lead.linkedin && (
-                <Action href={lead.linkedin} icon={Link2} tip="LinkedIn" />
-              )}
-              {mapsUrl && (
-                <Action href={mapsUrl} icon={MapPin} tip="Google Maps" />
-              )}
-              {lead.email && (
-                <Action
-                  href={`mailto:${lead.email}`}
-                  icon={Mail}
-                  tip="Email"
-                />
-              )}
-              {lead.email && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  title="Copiar email"
-                  onClick={() => copy(lead.email!, "Email")}
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </Button>
-              )}
-              {lead.phone && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  title="Copiar teléfono"
-                  onClick={() => copy(lead.phone!, "Teléfono")}
-                >
-                  <Phone className="h-3.5 w-3.5" />
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="icon"
-                title="Favorito"
-                onClick={() => savePatch({ favorite: !lead.favorite })}
-              >
-                <Star
-                  className={`h-3.5 w-3.5 ${lead.favorite ? "fill-amber-400 text-amber-400" : ""}`}
-                />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
-                disabled={analyzing || loading}
-                onClick={() => void detectPains()}
-              >
-                {analyzing ? (
-                  <Loader2 className="h-[18px] w-[18px] animate-spin" />
-                ) : (
-                  <ScanSearch className="h-[18px] w-[18px]" />
-                )}
-                {analyzing ? "Detectando…" : "Detectar dolores"}
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                title="Archivar"
-                onClick={() => setConfirmArchive(true)}
-              >
-                <Trash2 className="h-3.5 w-3.5 text-red-400" />
-              </Button>
-            </div>
-
             <Section title="Empresa">
               <Field label="Nombre" value={lead.companyName} />
               <Field label="Web" value={lead.website} />

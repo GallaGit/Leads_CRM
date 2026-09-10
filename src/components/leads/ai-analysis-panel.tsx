@@ -59,7 +59,7 @@ export function AiAnalysisPanel({
           </p>
         ) : null}
 
-        {!analyzing && !empty && analysis ? (
+        {!analyzing && !error && !empty && analysis ? (
           <PainAnalysisBlocks analysis={analysis} />
         ) : null}
       </div>
