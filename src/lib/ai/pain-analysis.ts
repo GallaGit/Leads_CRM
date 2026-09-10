@@ -94,6 +94,17 @@ export function painAnalysisToWebhookPayload(
   };
 }
 
+/** Enough raw signal to ask Groq; otherwise the UI shows the empty state. */
+export function hasPainAnalysisSignal(lead: Lead): boolean {
+  return Boolean(
+    lead.website?.trim() ||
+      lead.notes?.trim() ||
+      lead.notesOverflow?.trim() ||
+      lead.software?.trim() ||
+      lead.services.some((service) => service.trim()),
+  );
+}
+
 export function buildLeadFacts(lead: Lead): string {
   const lines: string[] = [];
   const add = (label: string, value: string | number | null | undefined) => {

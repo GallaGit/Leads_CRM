@@ -5,6 +5,8 @@ import {
 } from "@/lib/ai/analyze-lead-pains";
 import {
   formatPainAnalysis,
+  hasPainAnalysisSignal,
+  isPainAnalysisEmpty,
   painAnalysisToWebhookPayload,
 } from "@/lib/ai/pain-analysis";
 import { dispatchLeadAnalyzed } from "@/lib/automations/dispatch";
@@ -32,18 +34,40 @@ export async function POST(_request: Request, ctx: Ctx) {
     return NextResponse.json({ error: "Lead no encontrado" }, { status: 404 });
   }
 
+  if (!hasPainAnalysisSignal(lead)) {
+    return NextResponse.json({
+      lead,
+      empty: true,
+      analysis: { evidence: [], inference: [], speculation: [], text: "" },
+    });
+  }
+
   let analysis;
   try {
     analysis = await analyzeLeadPains(lead);
   } catch (e) {
     if (e instanceof PainAnalysisError) {
-      const status =
-        e.code === "not_configured" ? 503 : e.code === "provider" ? 502 : 502;
+      if (e.code === "empty" || e.code === "invalid") {
+        return NextResponse.json({
+          lead,
+          empty: true,
+          analysis: { evidence: [], inference: [], speculation: [], text: "" },
+        });
+      }
+      const status = e.code === "not_configured" ? 503 : 502;
       return NextResponse.json({ error: e.message, code: e.code }, { status });
     }
     const message =
       e instanceof Error ? e.message : "Error al analizar el lead";
     return NextResponse.json({ error: message }, { status: 502 });
+  }
+
+  if (isPainAnalysisEmpty(analysis)) {
+    return NextResponse.json({
+      lead,
+      empty: true,
+      analysis: { evidence: [], inference: [], speculation: [], text: "" },
+    });
   }
 
   const text = formatPainAnalysis(analysis);

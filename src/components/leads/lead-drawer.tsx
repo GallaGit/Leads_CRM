@@ -27,6 +27,7 @@ import { EmailEditor } from "@/components/leads/email-editor";
 import {
   PainAnalysisBlocks,
   PainAnalysisFallback,
+  PainAnalysisSkeletons,
 } from "@/components/leads/pain-analysis-section";
 import {
   hasStructuredPainAnalysis,
@@ -40,6 +41,10 @@ import {
 import { pickLeadEmail } from "@/lib/utils/gmail-compose";
 import { statusColor, useUiStore } from "@/store/ui-store";
 import { toastAutomationDispatch } from "@/components/automations/toast-dispatch";
+
+function isGenericNetworkError(message: string): boolean {
+  return /failed to fetch|network|timeout|aborterror/i.test(message);
+}
 
 function copy(text: string, label: string) {
   void navigator.clipboard.writeText(text);
@@ -95,6 +100,7 @@ function LeadDrawerBody({
   const [saving, setSaving] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+  const [analyzeEmpty, setAnalyzeEmpty] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -144,27 +150,36 @@ function LeadDrawerBody({
   }
 
   async function detectPains() {
-    if (!lead || analyzing) return;
+    if (!lead || analyzing || loading) return;
     setAnalyzing(true);
     setAnalyzeError(null);
+    setAnalyzeEmpty(false);
     try {
       const res = await fetch(`/api/leads/${lead.id}/analyze`, {
         method: "POST",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al analizar");
-      setLead(data.lead);
-      upsertLead(data.lead);
+      if (data.lead) {
+        setLead(data.lead);
+        upsertLead(data.lead);
+      }
       if (Array.isArray(data.activity)) {
         setActivity(data.activity);
       }
-      toast.success("Análisis de dolores guardado");
+      if (data.empty) {
+        setAnalyzeEmpty(true);
+        return;
+      }
+      toast.success("Análisis guardado");
       toastAutomationDispatch(data.automation);
     } catch (e) {
       const message =
         e instanceof Error ? e.message : "Error al detectar dolores";
       setAnalyzeError(message);
-      toast.error(message);
+      if (isGenericNetworkError(message)) {
+        toast.error("No se pudo detectar dolores.");
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -269,8 +284,8 @@ function LeadDrawerBody({
               <Button
                 variant="outline"
                 size="sm"
-                title="Detectar dolores"
-                disabled={analyzing || saving}
+                title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
+                disabled={analyzing || saving || loading}
                 onClick={() => void detectPains()}
               >
                 {analyzing ? (
@@ -278,7 +293,7 @@ function LeadDrawerBody({
                 ) : (
                   <ScanSearch className="h-3.5 w-3.5" />
                 )}
-                Detectar dolores
+                {analyzing ? "Detectando…" : "Detectar dolores"}
               </Button>
               <Button
                 variant="outline"
@@ -351,26 +366,48 @@ function LeadDrawerBody({
             </Section>
 
             <Section title="Dolores / Análisis IA">
-              {analyzing ? (
+              {analyzing ? <PainAnalysisSkeletons /> : null}
+              {!analyzing && analyzeError ? (
+                <div className="rounded-md border border-red-500/40 px-2.5 py-2">
+                  <p className="text-[12px] text-red-400">
+                    No se pudo detectar dolores. {analyzeError}
+                  </p>
+                  <Button
+                    className="mt-2"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void detectPains()}
+                  >
+                    Reintentar
+                  </Button>
+                </div>
+              ) : null}
+              {!analyzing && !analyzeError && analyzeEmpty ? (
+                <div>
+                  <p className="text-[12px] text-[var(--muted-fg)]">
+                    No hay señales suficientes en este lead.
+                  </p>
+                  <p className="mt-1 text-[11px] text-[var(--muted-fg)]">
+                    Añade web, servicios o notas y vuelve a intentar.
+                  </p>
+                </div>
+              ) : null}
+              {!analyzing &&
+              !analyzeError &&
+              !analyzeEmpty &&
+              !lead.aiAnalysis ? (
                 <p className="text-[12px] text-[var(--muted-fg)]">
-                  Analizando dolores…
+                  Aún no hay análisis. Pulsa Detectar dolores.
                 </p>
               ) : null}
-              {analyzeError ? (
-                <p className="text-[12px] text-red-400">{analyzeError}</p>
-              ) : null}
-              {!analyzing && !lead.aiAnalysis ? (
-                <p className="text-[12px] text-[var(--muted-fg)]">
-                  Aún no hay análisis. Pulsa Detectar dolores para separar
-                  evidencia, inferencia y especulación a partir de los datos del
-                  lead.
-                </p>
-              ) : null}
-              {lead.aiAnalysis && hasStructuredPainAnalysis(lead.aiAnalysis) ? (
+              {!analyzing &&
+              !analyzeEmpty &&
+              lead.aiAnalysis &&
+              hasStructuredPainAnalysis(lead.aiAnalysis) ? (
                 <PainAnalysisBlocks
                   analysis={parsePainAnalysis(lead.aiAnalysis)}
                 />
-              ) : lead.aiAnalysis ? (
+              ) : !analyzing && !analyzeEmpty && lead.aiAnalysis ? (
                 <PainAnalysisFallback text={lead.aiAnalysis} />
               ) : null}
             </Section>
