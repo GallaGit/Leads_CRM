@@ -60,10 +60,11 @@ function isNotionNotFound(error: unknown): boolean {
 
 export async function runLeadAnalyze(
   id: string,
-  options: { force?: boolean } = {},
+  options: { force?: boolean; persist?: boolean } = {},
 ): Promise<AnalyzeLeadResult> {
   const repo = getLeadRepository();
   const force = options.force === true;
+  const persist = options.persist !== false;
 
   let lead: Lead | null;
   try {
@@ -109,6 +110,20 @@ export async function runLeadAnalyze(
 
   const text = formatPainAnalysis(analysis);
   const apiAnalysis = toApiPainAnalysis(analysis, analysisMeta());
+
+  if (!persist) {
+    return {
+      ok: true,
+      status: 200,
+      body: {
+        leadId: lead.id,
+        analysis: apiAnalysis,
+        notionUpdated: false,
+        notified: false,
+        lead,
+      },
+    };
+  }
 
   let saved: Lead;
   try {

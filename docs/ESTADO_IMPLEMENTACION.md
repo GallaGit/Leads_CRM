@@ -95,8 +95,8 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 
 - botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar);
 - sección **Dolores** (`ai-analysis-panel.tsx`) debajo de CRM;
-- `POST /api/leads/:id/analyze` (alias `POST /api/leads/pain-analysis`) llama a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escribe Notion `Análisis IA` (rich_text);
-- contrato: `docs/CONTRACT-pain-analysis.md` — 200 con `evidencia` / `inferencia` / `especulacion`; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
+- `POST /api/leads/:id/analyze` (drawer Front) y `POST /api/leads/pain-analysis` (contrato Grok: `{ id?, lead?, persist? }`) llaman a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escriben Notion `Análisis IA` (rich_text) si persist;
+- contrato: `docs/CONTRACT-pain-analysis.md` — Evidencia / Inferencia / Especulación; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
 - salida estructurada **Evidencia / Inferencia / Especulación** (`src/lib/ai/pain-analysis.ts`); la UI muestra tres bloques, no un `<pre>` crudo;
 - re-ejecutar está permitido y sobrescribe el análisis; sin confirmación en v1;
 - un fallo de Groq no modifica el lead; actividad (`ai_analyzed`) y comentario Notion en best-effort como el resto de acciones;
