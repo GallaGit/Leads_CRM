@@ -202,7 +202,7 @@ En el panel del lead, **Detectar dolores** (después de Favorito) llama a Groq c
 - Requiere API key de Groq en Settings. Un error de Groq no modifica el lead.
 - Si la automatización *Lead analizado* está activa y tiene webhook, se notifica a n8n en segundo plano.
 
-La sección **Dolores / Análisis IA** está debajo de CRM y encima de Notas.
+La sección **Dolores** está debajo de CRM y encima de Notas.
 
 ### Acciones externas
 

@@ -82,6 +82,36 @@ export function hasStructuredPainAnalysis(
   return !isPainAnalysisEmpty(parsePainAnalysis(text));
 }
 
+/** Map the analyze API payload (Spanish or English keys) into UI blocks. */
+export function fromApiPainAnalysis(value: unknown): PainAnalysis | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const analysis = normalizePainAnalysis({
+    evidence: asStringList(
+      record.evidencia ?? record.evidence ?? record.Evidencia,
+    ),
+    inference: asStringList(
+      record.inferencia ?? record.inference ?? record.Inferencia,
+    ),
+    speculation: asStringList(
+      record.especulacion ?? record.speculation ?? record.Especulación,
+    ),
+  });
+  return isPainAnalysisEmpty(analysis) ? null : analysis;
+}
+
+/** Prefer structured API analysis; else split the stored Notion string. */
+export function resolvePainAnalysis(
+  apiAnalysis: unknown,
+  storedText: string | null | undefined,
+): PainAnalysis | null {
+  const fromApi = fromApiPainAnalysis(apiAnalysis);
+  if (fromApi) return fromApi;
+  const parsed = parsePainAnalysis(storedText);
+  if (!isPainAnalysisEmpty(parsed)) return parsed;
+  return null;
+}
+
 export function painAnalysisToWebhookPayload(
   analysis: PainAnalysis,
   text: string,

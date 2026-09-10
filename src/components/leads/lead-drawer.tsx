@@ -24,15 +24,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmailEditor } from "@/components/leads/email-editor";
-import {
-  PainAnalysisBlocks,
-  PainAnalysisFallback,
-  PainAnalysisSkeletons,
-} from "@/components/leads/pain-analysis-section";
-import {
-  hasStructuredPainAnalysis,
-  parsePainAnalysis,
-} from "@/lib/ai/pain-analysis";
+import { AiAnalysisPanel } from "@/components/leads/ai-analysis-panel";
+import { resolvePainAnalysis } from "@/lib/ai/pain-analysis";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/domain/lead";
 import {
   OBSERVACIONES_SOFT_LIMIT,
@@ -44,6 +37,25 @@ import { toastAutomationDispatch } from "@/components/automations/toast-dispatch
 
 function isGenericNetworkError(message: string): boolean {
   return /failed to fetch|network|timeout|aborterror/i.test(message);
+}
+
+type AnalyzeResponse = {
+  error?: unknown;
+  code?: unknown;
+  lead?: Lead;
+  analysis?: unknown;
+  activity?: { at: string; type: string; message: string }[];
+  empty?: boolean;
+  notionUpdated?: boolean;
+  automation?: Parameters<typeof toastAutomationDispatch>[0];
+};
+
+function isAiError(data: { error?: unknown; code?: unknown }): boolean {
+  if (data.code === "ai_error") return true;
+  if (data.error && typeof data.error === "object") {
+    return (data.error as { code?: unknown }).code === "ai_error";
+  }
+  return false;
 }
 
 function analyzeErrorMessage(data: {
@@ -115,6 +127,7 @@ function LeadDrawerBody({
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [analyzeEmpty, setAnalyzeEmpty] = useState(false);
+  const [apiAnalysis, setApiAnalysis] = useState<unknown>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -130,6 +143,9 @@ function LeadDrawerBody({
         setEmailSubject(data.lead.emailSubject ?? "");
         setEmailBody(data.lead.emailBody ?? "");
         setActivity(data.activity ?? []);
+        setApiAnalysis(null);
+        setAnalyzeEmpty(false);
+        setAnalyzeError(null);
         upsertLead(data.lead);
       })
       .catch((e) => toast.error(e.message))
@@ -165,30 +181,45 @@ function LeadDrawerBody({
 
   async function detectPains(force = false) {
     if (!lead || analyzing || loading) return;
+    const previous = lead;
     setAnalyzing(true);
     setAnalyzeError(null);
     setAnalyzeEmpty(false);
     try {
-      const res = await fetch(`/api/leads/${lead.id}/analyze`, {
+      const res = await fetch(`/api/leads/${previous.id}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ force }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as AnalyzeResponse;
       if (!res.ok) {
-        throw new Error(analyzeErrorMessage(data));
+        const message = analyzeErrorMessage(data);
+        setAnalyzeError(message);
+        setLead(previous);
+        if (isAiError(data) || isGenericNetworkError(message)) {
+          toast.error("No se pudo detectar dolores.");
+        }
+        return;
       }
       if (data.lead) {
         setLead(data.lead);
         upsertLead(data.lead);
       }
+      setApiAnalysis(data.analysis ?? null);
       if (Array.isArray(data.activity)) {
         setActivity(data.activity);
+      } else if (data.lead?.id) {
+        void refreshActivity(data.lead.id);
       }
-      if (data.empty) {
+      const resolved = resolvePainAnalysis(
+        data.analysis,
+        data.lead?.aiAnalysis ?? previous.aiAnalysis,
+      );
+      if (data.empty || !resolved) {
         setAnalyzeEmpty(true);
         return;
       }
+      setAnalyzeEmpty(false);
       if (data.notionUpdated) {
         toast.success("Análisis guardado");
       }
@@ -197,11 +228,22 @@ function LeadDrawerBody({
       const message =
         e instanceof Error ? e.message : "Error al detectar dolores";
       setAnalyzeError(message);
-      if (isGenericNetworkError(message) || /ai_error|Groq|GROQ/i.test(message)) {
-        toast.error("No se pudo detectar dolores.");
-      }
+      setLead(previous);
+      toast.error("No se pudo detectar dolores.");
     } finally {
       setAnalyzing(false);
+    }
+  }
+
+  async function refreshActivity(id: string) {
+    try {
+      const res = await fetch(`/api/leads/${id}`);
+      const data = (await res.json()) as { activity?: typeof activity };
+      if (res.ok && Array.isArray(data.activity)) {
+        setActivity(data.activity);
+      }
+    } catch {
+      // best-effort
     }
   }
 
@@ -305,13 +347,13 @@ function LeadDrawerBody({
                 variant="outline"
                 size="sm"
                 title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
-                disabled={analyzing || saving || loading}
+                disabled={analyzing || loading}
                 onClick={() => void detectPains()}
               >
                 {analyzing ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-[18px] w-[18px] animate-spin" />
                 ) : (
-                  <ScanSearch className="h-3.5 w-3.5" />
+                  <ScanSearch className="h-[18px] w-[18px]" />
                 )}
                 {analyzing ? "Detectando…" : "Detectar dolores"}
               </Button>
@@ -385,52 +427,13 @@ function LeadDrawerBody({
               />
             </Section>
 
-            <Section title="Dolores / Análisis IA">
-              {analyzing ? <PainAnalysisSkeletons /> : null}
-              {!analyzing && analyzeError ? (
-                <div className="rounded-md border border-red-500/40 px-2.5 py-2">
-                  <p className="text-[12px] text-red-400">
-                    No se pudo detectar dolores. {analyzeError}
-                  </p>
-                  <Button
-                    className="mt-2"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void detectPains(true)}
-                  >
-                    Reintentar
-                  </Button>
-                </div>
-              ) : null}
-              {!analyzing && !analyzeError && analyzeEmpty ? (
-                <div>
-                  <p className="text-[12px] text-[var(--muted-fg)]">
-                    No hay señales suficientes en este lead.
-                  </p>
-                  <p className="mt-1 text-[11px] text-[var(--muted-fg)]">
-                    Añade web, servicios o notas y vuelve a intentar.
-                  </p>
-                </div>
-              ) : null}
-              {!analyzing &&
-              !analyzeError &&
-              !analyzeEmpty &&
-              !lead.aiAnalysis ? (
-                <p className="text-[12px] text-[var(--muted-fg)]">
-                  Aún no hay análisis. Pulsa Detectar dolores.
-                </p>
-              ) : null}
-              {!analyzing &&
-              !analyzeEmpty &&
-              lead.aiAnalysis &&
-              hasStructuredPainAnalysis(lead.aiAnalysis) ? (
-                <PainAnalysisBlocks
-                  analysis={parsePainAnalysis(lead.aiAnalysis)}
-                />
-              ) : !analyzing && !analyzeEmpty && lead.aiAnalysis ? (
-                <PainAnalysisFallback text={lead.aiAnalysis} />
-              ) : null}
-            </Section>
+            <AiAnalysisPanel
+              analyzing={analyzing}
+              error={analyzeError}
+              empty={analyzeEmpty}
+              analysis={resolvePainAnalysis(apiAnalysis, lead.aiAnalysis)}
+              onRetry={() => void detectPains(true)}
+            />
 
             <Section title="Notas">
               <Textarea

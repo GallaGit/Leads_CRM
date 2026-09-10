@@ -94,6 +94,7 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 ### Detectar dolores (Fase 7)
 
 - botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar);
+- sección **Dolores** (`ai-analysis-panel.tsx`) debajo de CRM;
 - `POST /api/leads/:id/analyze` (alias `POST /api/leads/pain-analysis`) llama a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escribe Notion `Análisis IA` (rich_text);
 - contrato: `docs/CONTRACT-pain-analysis.md` — 200 con `evidencia` / `inferencia` / `especulacion`; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
 - salida estructurada **Evidencia / Inferencia / Especulación** (`src/lib/ai/pain-analysis.ts`); la UI muestra tres bloques, no un `<pre>` crudo;
