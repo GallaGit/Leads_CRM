@@ -159,11 +159,18 @@ export class NotionLeadRepository implements LeadRepository {
     ) {
       await this.appendActivity(id, "Email editado", "email_edited");
     } else if (patch.aiAnalysis !== undefined) {
-      await this.appendActivity(
-        id,
-        "Análisis IA de dolores actualizado",
-        "ai_analyzed",
-      );
+      try {
+        await this.appendActivity(
+          id,
+          "Análisis IA de dolores actualizado",
+          "ai_analyzed",
+        );
+      } catch (error) {
+        console.error("[activity] ai_analyzed failed", {
+          id,
+          reason: error instanceof Error ? error.message : "unknown",
+        });
+      }
       await this.addComment(id, "Análisis IA de dolores actualizado");
     }
 

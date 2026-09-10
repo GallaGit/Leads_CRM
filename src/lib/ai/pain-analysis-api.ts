@@ -9,12 +9,22 @@ export type ApiPainAnalysis = {
   summary: string;
   model: string;
   analyzedAt: string;
-  promptVersion?: string;
+};
+
+export type AnalyzeSuccessBody = {
+  leadId: string;
+  analysis: ApiPainAnalysis;
+  notionUpdated: boolean;
+  notified: boolean;
+  lead: Lead;
+  activity?: { at: string; type: string; message: string }[];
+  automation?: AutomationDispatchResult;
+  empty?: boolean;
 };
 
 export function toApiPainAnalysis(
   analysis: PainAnalysis,
-  extras: { model: string; analyzedAt?: string; promptVersion?: string },
+  extras: { model: string; analyzedAt?: string },
 ): ApiPainAnalysis {
   const summary =
     analysis.evidence[0] ||
@@ -28,14 +38,12 @@ export function toApiPainAnalysis(
     summary,
     model: extras.model,
     analyzedAt: extras.analyzedAt ?? new Date().toISOString(),
-    ...(extras.promptVersion ? { promptVersion: extras.promptVersion } : {}),
   };
 }
 
 export function emptyApiPainAnalysis(extras: {
   model: string;
   analyzedAt?: string;
-  promptVersion?: string;
 }): ApiPainAnalysis {
   return toApiPainAnalysis(
     { evidence: [], inference: [], speculation: [] },
@@ -58,7 +66,7 @@ export function analyzeSuccessPayload(input: {
   activity?: { at: string; type: string; message: string }[];
   automation?: AutomationDispatchResult;
   empty?: boolean;
-}) {
+}): AnalyzeSuccessBody {
   return {
     leadId: input.lead.id,
     analysis: input.analysis,

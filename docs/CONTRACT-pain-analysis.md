@@ -26,8 +26,7 @@ Body opcional:
     "especulacion": ["…"],
     "summary": "…",
     "model": "openai/gpt-oss-120b",
-    "analyzedAt": "2026-09-10T12:00:00.000Z",
-    "promptVersion": "pain-analysis-v1-reconstructed"
+    "analyzedAt": "2026-09-10T12:00:00.000Z"
   },
   "notionUpdated": true,
   "notified": false,
