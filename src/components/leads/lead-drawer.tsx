@@ -46,6 +46,20 @@ function isGenericNetworkError(message: string): boolean {
   return /failed to fetch|network|timeout|aborterror/i.test(message);
 }
 
+function analyzeErrorMessage(data: {
+  error?: unknown;
+  code?: unknown;
+}): string {
+  if (data.error && typeof data.error === "object") {
+    const err = data.error as { message?: unknown; code?: unknown };
+    if (typeof err.message === "string" && err.message.trim()) {
+      return err.message;
+    }
+  }
+  if (typeof data.error === "string" && data.error.trim()) return data.error;
+  return "Error al analizar";
+}
+
 function copy(text: string, label: string) {
   void navigator.clipboard.writeText(text);
   toast.success(`${label} copiado`);
@@ -149,7 +163,7 @@ function LeadDrawerBody({
     }
   }
 
-  async function detectPains() {
+  async function detectPains(force = false) {
     if (!lead || analyzing || loading) return;
     setAnalyzing(true);
     setAnalyzeError(null);
@@ -157,9 +171,13 @@ function LeadDrawerBody({
     try {
       const res = await fetch(`/api/leads/${lead.id}/analyze`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error al analizar");
+      if (!res.ok) {
+        throw new Error(analyzeErrorMessage(data));
+      }
       if (data.lead) {
         setLead(data.lead);
         upsertLead(data.lead);
@@ -171,13 +189,15 @@ function LeadDrawerBody({
         setAnalyzeEmpty(true);
         return;
       }
-      toast.success("Análisis guardado");
+      if (data.notionUpdated) {
+        toast.success("Análisis guardado");
+      }
       toastAutomationDispatch(data.automation);
     } catch (e) {
       const message =
         e instanceof Error ? e.message : "Error al detectar dolores";
       setAnalyzeError(message);
-      if (isGenericNetworkError(message)) {
+      if (isGenericNetworkError(message) || /ai_error|Groq|GROQ/i.test(message)) {
         toast.error("No se pudo detectar dolores.");
       }
     } finally {
@@ -376,7 +396,7 @@ function LeadDrawerBody({
                     className="mt-2"
                     variant="outline"
                     size="sm"
-                    onClick={() => void detectPains()}
+                    onClick={() => void detectPains(true)}
                   >
                     Reintentar
                   </Button>

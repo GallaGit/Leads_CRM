@@ -200,7 +200,7 @@ Solo filtros y visibilidad de columnas se persisten en `localStorage`. Notion si
 - `GET /api/leads/:id`: detalle, overflow de notas y actividad.
 - `PATCH /api/leads/:id`: actualización parcial.
 - `DELETE /api/leads/:id`: archiva.
-- `POST /api/leads/:id/analyze`: Detectar dolores (Groq → `Análisis IA`; `notifyLeadAnalyzed` best-effort).
+- `POST /api/leads/:id/analyze`: Detectar dolores (Groq → `Análisis IA`; `notifyLeadAnalyzed` best-effort). Alias `POST /api/leads/pain-analysis`.
 - `POST /api/sync`: recupera todos los leads activos.
 - `GET /api/settings`: configuración pública (enmascarada).
 - `PATCH /api/settings`: guarda overrides en `data/settings.local.json`.

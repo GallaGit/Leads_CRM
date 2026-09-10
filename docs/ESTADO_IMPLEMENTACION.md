@@ -69,6 +69,7 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 - `PATCH /api/leads/:id`
 - `DELETE /api/leads/:id`
 - `POST /api/leads/:id/analyze`
+- `POST /api/leads/pain-analysis` *(alias)*
 - `GET /api/leads/duplicates`
 - `POST /api/leads/merge`
 - `POST /api/leads/score`
@@ -93,7 +94,8 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 ### Detectar dolores (Fase 7)
 
 - botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar);
-- `POST /api/leads/:id/analyze` llama a Groq (`src/lib/ai/groq-client.ts`, secretos solo servidor) y escribe Notion `Análisis IA` (rich_text);
+- `POST /api/leads/:id/analyze` (alias `POST /api/leads/pain-analysis`) llama a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escribe Notion `Análisis IA` (rich_text);
+- contrato: `docs/CONTRACT-pain-analysis.md` — 200 con `evidencia` / `inferencia` / `especulacion`; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
 - salida estructurada **Evidencia / Inferencia / Especulación** (`src/lib/ai/pain-analysis.ts`); la UI muestra tres bloques, no un `<pre>` crudo;
 - re-ejecutar está permitido y sobrescribe el análisis; sin confirmación en v1;
 - un fallo de Groq no modifica el lead; actividad (`ai_analyzed`) y comentario Notion en best-effort como el resto de acciones;

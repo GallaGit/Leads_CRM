@@ -10,6 +10,8 @@ import {
 import type { Lead } from "@/lib/domain/lead";
 import { getSettingsService } from "@/lib/settings/service";
 
+export const PAIN_ANALYSIS_PROMPT_VERSION = "pain-analysis-v1-reconstructed";
+
 const SYSTEM_PROMPT = `Eres un analista comercial para una agencia que vende automatización e IA a asesorías y gestorías (Valencia y alrededores). Tu trabajo es detectar posibles dolores de negocio a partir SOLO de los datos del lead.
 
 Debes separar SIEMPRE tres secciones:
@@ -52,7 +54,7 @@ export function assertGroqConfigured(): void {
   }
 }
 
-export async function analyzeLeadPains(lead: Lead): Promise<PainAnalysis> {
+export async function analyzeBusinessPains(lead: Lead): Promise<PainAnalysis> {
   assertGroqConfigured();
 
   let content: string;
@@ -88,6 +90,9 @@ export async function analyzeLeadPains(lead: Lead): Promise<PainAnalysis> {
   }
   return analysis;
 }
+
+/** @deprecated Use analyzeBusinessPains */
+export const analyzeLeadPains = analyzeBusinessPains;
 
 function buildUserPrompt(lead: Lead): string {
   const facts = buildLeadFacts(lead);
