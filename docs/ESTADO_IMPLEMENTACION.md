@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Fecha de revisión: 2026-09-10 (Fase 7: Detectar dolores IA + persistencia `Análisis IA`; alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07: SettingsService + N8nClient + UI Integraciones/Automations. El repositorio está en GitHub (`GallaGit/Leads_CRM`).
+Fecha de revisión: 2026-09-10 (Fase 7: Detectar dolores IA + persistencia `Análisis IA`; alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; filtro 3–10 operativo; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07: SettingsService + N8nClient + UI Integraciones/Automations. El repositorio está en GitHub (`GallaGit/Leads_CRM`); el merge de duplicados ya está en código (ver Disponible).
 
 Este documento describe el comportamiento del código actual. No sustituye a [`DECISIONES.md`](./DECISIONES.md) ni al [`ROADMAP.md`](./ROADMAP.md).
 
