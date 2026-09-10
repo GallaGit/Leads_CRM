@@ -11,6 +11,8 @@ import {
   Copy,
   Star,
   Trash2,
+  ScanSearch,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmailEditor } from "@/components/leads/email-editor";
+import {
+  PainAnalysisBlocks,
+  PainAnalysisFallback,
+} from "@/components/leads/pain-analysis-section";
+import {
+  hasStructuredPainAnalysis,
+  parsePainAnalysis,
+} from "@/lib/ai/pain-analysis";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/domain/lead";
 import {
   OBSERVACIONES_SOFT_LIMIT,
@@ -83,6 +93,8 @@ function LeadDrawerBody({
   const [loading, setLoading] = useState(true);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,6 +140,33 @@ function LeadDrawerBody({
       toast.error(e instanceof Error ? e.message : "Error");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function detectPains() {
+    if (!lead || analyzing) return;
+    setAnalyzing(true);
+    setAnalyzeError(null);
+    try {
+      const res = await fetch(`/api/leads/${lead.id}/analyze`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al analizar");
+      setLead(data.lead);
+      upsertLead(data.lead);
+      if (Array.isArray(data.activity)) {
+        setActivity(data.activity);
+      }
+      toast.success("Análisis de dolores guardado");
+      toastAutomationDispatch(data.automation);
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : "Error al detectar dolores";
+      setAnalyzeError(message);
+      toast.error(message);
+    } finally {
+      setAnalyzing(false);
     }
   }
 
@@ -229,6 +268,20 @@ function LeadDrawerBody({
               </Button>
               <Button
                 variant="outline"
+                size="sm"
+                title="Detectar dolores"
+                disabled={analyzing || saving}
+                onClick={() => void detectPains()}
+              >
+                {analyzing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ScanSearch className="h-3.5 w-3.5" />
+                )}
+                Detectar dolores
+              </Button>
+              <Button
+                variant="outline"
                 size="icon"
                 title="Archivar"
                 onClick={() => setConfirmArchive(true)}
@@ -297,6 +350,31 @@ function LeadDrawerBody({
               />
             </Section>
 
+            <Section title="Dolores / Análisis IA">
+              {analyzing ? (
+                <p className="text-[12px] text-[var(--muted-fg)]">
+                  Analizando dolores…
+                </p>
+              ) : null}
+              {analyzeError ? (
+                <p className="text-[12px] text-red-400">{analyzeError}</p>
+              ) : null}
+              {!analyzing && !lead.aiAnalysis ? (
+                <p className="text-[12px] text-[var(--muted-fg)]">
+                  Aún no hay análisis. Pulsa Detectar dolores para separar
+                  evidencia, inferencia y especulación a partir de los datos del
+                  lead.
+                </p>
+              ) : null}
+              {lead.aiAnalysis && hasStructuredPainAnalysis(lead.aiAnalysis) ? (
+                <PainAnalysisBlocks
+                  analysis={parsePainAnalysis(lead.aiAnalysis)}
+                />
+              ) : lead.aiAnalysis ? (
+                <PainAnalysisFallback text={lead.aiAnalysis} />
+              ) : null}
+            </Section>
+
             <Section title="Notas">
               <Textarea
                 value={notes}
@@ -345,14 +423,6 @@ function LeadDrawerBody({
                 }
               />
             </Section>
-
-            {lead.aiAnalysis && (
-              <Section title="Análisis IA">
-                <pre className="whitespace-pre-wrap text-[12px] text-[var(--muted-fg)]">
-                  {lead.aiAnalysis}
-                </pre>
-              </Section>
-            )}
 
             <Section title="Actividad">
               {activity.length === 0 ? (

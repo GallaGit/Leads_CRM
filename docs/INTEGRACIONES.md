@@ -205,7 +205,7 @@ GROQ_TOP_P=1
 GROQ_REASONING_EFFORT=medium
 ```
 
-La acción de análisis de dolores todavía no está implementada en la UI. Cuando se añada, su salida se guardará en `Análisis IA` y debe separar evidencia, inferencia y especulación.
+La acción **Detectar dolores** del drawer llama a Groq (`src/lib/ai/groq-client.ts`), guarda el resultado en `Análisis IA` y separa evidencia, inferencia y especulación. Un fallo de Groq no escribe el lead. Si la automatización *Lead analizado* está activa, se dispara `notifyLeadAnalyzed` en segundo plano.
 
 ## Variables de entorno
 

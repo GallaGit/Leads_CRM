@@ -85,8 +85,8 @@ Objetivo: shell usable, tema Linear-like, env seguro, tipos de dominio, cliente 
 
 ## Fase 7 — AI + n8n client + Settings (Prompt 3)
 
-- [ ] Acción **Detectar dolores del negocio** → propiedad `Análisis IA` (evidencia / inferencia / especulación)
-- [x] `N8nClient` + Automations UI (cliente listo; en v1 sin trigger en el workflow n8n — no pegar URL ni activar toggles)
+- [x] Acción **Detectar dolores del negocio** → propiedad `Análisis IA` (evidencia / inferencia / especulación)
+- [x] `N8nClient` + Automations UI (cliente listo; en v1 sin trigger en el workflow n8n — no pegar URL ni activar toggles; la app dispara en alta/edición/análisis si el toggle está activo y hay URL)
 - [x] Settings: Notion, SerpAPI (referencia), AI, n8n URLs; tests de conexión sin exponer secretos
 - [x] Sync indicador completo (por integración: never / syncing / ok / error + lastSyncedAt)
 

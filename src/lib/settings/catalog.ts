@@ -47,7 +47,7 @@ export const AUTOMATION_CATALOG: Record<
   lead_analyzed: {
     name: "Lead analizado",
     description:
-      "Sin flujo n8n en v1. Depende de Detectar dolores (aún pendiente).",
+      "Webhook tras Detectar dolores. Se dispara en segundo plano si está activo y hay URL. En v1 no hay trigger n8n ni URL configurada.",
     envKeys: ["N8N_WEBHOOK_LEAD_ANALYZED", "N8N_WEBHOOK_ANALIZAR_LEAD"],
   },
 };

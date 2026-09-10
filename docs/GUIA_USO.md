@@ -193,6 +193,17 @@ Puedes editar asunto y cuerpo, guardarlos, copiarlos o guardarlos y marcar el le
 
 La estrella de la tabla o del drawer actualiza la propiedad `Favorito` de Notion.
 
+### Detectar dolores
+
+En el panel del lead, **Detectar dolores** (después de Favorito) llama a Groq con los datos del registro y guarda el resultado en la propiedad Notion `Análisis IA`.
+
+- El texto se separa en **Evidencia**, **Inferencia** y **Especulación**. La evidencia solo usa hechos del lead; no inventa webs, cifras ni software.
+- Puedes repetir la acción; sobrescribe el análisis anterior (sin confirmación en v1).
+- Requiere API key de Groq en Settings. Un error de Groq no modifica el lead.
+- Si la automatización *Lead analizado* está activa y tiene webhook, se notifica a n8n en segundo plano.
+
+La sección **Dolores / Análisis IA** está debajo de CRM y encima de Notas.
+
 ### Acciones externas
 
 El drawer permite:
@@ -256,7 +267,7 @@ El botón de la esquina superior cambia entre tema claro y oscuro. El diseño es
 
 ## Estado de las demás secciones
 
-Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations muestra la capa de webhooks n8n (sin trigger en el workflow en v1). El análisis IA de dolores sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
+Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations muestra la capa de webhooks n8n (sin trigger en el workflow en v1). Si hay toggle activo y URL, la app dispara en alta, edición y análisis de dolores (best-effort). Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
 
 ## Diagnóstico rápido
 

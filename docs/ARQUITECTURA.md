@@ -106,7 +106,7 @@ Acciones internas (con alias de env legacy):
 - `lead_updated` (Lead actualizado) — `N8N_WEBHOOK_LEAD_UPDATED`, alias `N8N_WEBHOOK_EJECUTAR` / `N8N_WEBHOOK_GENERAR_EMAIL`
 - `lead_analyzed` (Lead analizado) — `N8N_WEBHOOK_LEAD_ANALYZED`, alias `N8N_WEBHOOK_ANALIZAR_LEAD`
 
-El cliente es HTTP puro: timeout, errores HTTP, JSON inválido y logs (sin URL completa). No contiene lógica de negocio. Tras un alta o un PATCH exitoso en Notion, `dispatchLeadCreated` / `dispatchLeadUpdated` llaman a n8n en segundo plano **solo si** el toggle está activo y hay URL; un error de webhook no falla la persistencia. En v1 no hay URLs ni triggers en el workflow: la captación se lanza en n8n (Manual/semanal) y escribe leads en Notion con estado `Nuevo` y `Origen=n8n` (ver [`INTEGRACIONES.md`](./INTEGRACIONES.md)). Leads_CRM no modifica el workflow n8n ni dispara la captación desde el CRM.
+El cliente es HTTP puro: timeout, errores HTTP, JSON inválido y logs (sin URL completa). No contiene lógica de negocio. Tras un alta, un PATCH exitoso o un análisis IA, `dispatchLeadCreated` / `dispatchLeadUpdated` / `dispatchLeadAnalyzed` llaman a n8n en segundo plano **solo si** el toggle está activo y hay URL; un error de webhook no falla la persistencia. En v1 no hay URLs ni triggers en el workflow: la captación se lanza en n8n (Manual/semanal) y escribe leads en Notion con estado `Nuevo` y `Origen=n8n` (ver [`INTEGRACIONES.md`](./INTEGRACIONES.md)). Leads_CRM no modifica el workflow n8n ni dispara la captación desde el CRM.
 
 ### Autenticación
 
@@ -200,6 +200,7 @@ Solo filtros y visibilidad de columnas se persisten en `localStorage`. Notion si
 - `GET /api/leads/:id`: detalle, overflow de notas y actividad.
 - `PATCH /api/leads/:id`: actualización parcial.
 - `DELETE /api/leads/:id`: archiva.
+- `POST /api/leads/:id/analyze`: Detectar dolores (Groq → `Análisis IA`; `notifyLeadAnalyzed` best-effort).
 - `POST /api/sync`: recupera todos los leads activos.
 - `GET /api/settings`: configuración pública (enmascarada).
 - `PATCH /api/settings`: guarda overrides en `data/settings.local.json`.
