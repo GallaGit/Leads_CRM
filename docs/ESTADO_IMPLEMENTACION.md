@@ -93,7 +93,8 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 
 ### Detectar dolores (Fase 7)
 
-- botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar);
+- botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar); CTA fija en el header (sin scroll); al analizar: spinner + «Detectando…»;
+- spec UX: `docs/ux/SPEC-detectar-dolores-drawer.md`;
 - sección **Dolores** (`ai-analysis-panel.tsx`) debajo de CRM;
 - `POST /api/leads/:id/analyze` (drawer Front) y `POST /api/leads/pain-analysis` (contrato Grok: `{ id?, lead?, persist? }`) llaman a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escriben Notion `Análisis IA` (rich_text) si persist;
 - contrato: `docs/CONTRACT-pain-analysis.md` — Evidencia / Inferencia / Especulación; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
