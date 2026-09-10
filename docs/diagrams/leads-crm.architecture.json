@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Leads_CRM",
+    "quality_profile": "showcase",
+    "output": "leads-crm-architecture.html",
+    "repository": {
+      "url": "https://github.com/GallaGit/Leads_CRM",
+      "revision": "d8d943b7f300efdbe44eaae0fee3a248b623b8fa",
+      "provider": "github"
+    },
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "frontend": { "label": "Interfaz" },
+        "backend": { "label": "Servidor" },
+        "database": { "label": "Persistencia" },
+        "security": { "label": "Auth" },
+        "external": { "label": "Externo" }
+      }
+    },
+    "views": [
+      {
+        "id": "lectura",
+        "label": "Lectura y sync",
+        "focus": ["asesor", "ui", "api", "notion-adapter", "notion"],
+        "note": "El navegador llama a /api/*; Notion permanece como fuente de verdad."
+      },
+      {
+        "id": "secretos",
+        "label": "Secretos en servidor",
+        "focus": ["ui", "api", "settings", "notion-adapter", "notion"],
+        "note": "SettingsService mezcla env y settings.local.json; el cliente no recibe tokens."
+      },
+      {
+        "id": "automatizaciones",
+        "label": "Webhooks n8n",
+        "focus": ["api", "automations", "n8n", "settings"],
+        "note": "Tras persistir, el dispatch es fire-and-forget y no bloquea Notion."
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "cols": 5,
+    "gapX": 72,
+    "gapY": 120,
+    "cellW": 160,
+    "cellH": 72
+  },
+  "components": [
+    {
+      "id": "asesor",
+      "type": "external",
+      "label": "Asesor",
+      "row": 1,
+      "col": 0,
+      "size": [160, 72]
+    },
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "UI React",
+      "sublabel": "App Router",
+      "brand": "next-js",
+      "tag": "Zustand",
+      "row": 1,
+      "col": 1,
+      "size": [160, 72],
+      "sources": [
+        { "path": "src/components/leads/leads-page-client.tsx", "line": 1, "end_line": 28, "label": "LeadsPageClient" },
+        { "path": "src/components/layout/topbar.tsx", "line": 9, "end_line": 43, "label": "Sincronizar" }
+      ]
+    },
+    {
+      "id": "middleware",
+      "type": "security",
+      "label": "middleware",
+      "sublabel": "AUTH_DISABLED",
+      "row": 0,
+      "col": 1,
+      "size": [160, 72],
+      "sources": [
+        { "path": "src/middleware.ts", "line": 5, "end_line": 18, "label": "middleware" },
+        { "path": "src/lib/auth.ts", "line": 6, "end_line": 12, "label": "isAuthDisabled" }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "Route handlers",
+      "sublabel": "/api/*",
+      "row": 1,
+      "col": 2,
+      "size": [160, 72],
+      "sources": [
+        { "path": "src/app/api/leads/route.ts", "line": 21, "end_line": 25, "label": "GET /api/leads" },
+        { "path": "src/app/api/sync/route.ts", "line": 6, "end_line": 14, "label": "POST /api/sync" }
+      ]
+    },
+    {
+      "id": "settings",
+      "type": "backend",
+      "label": "SettingsService",
+      "sublabel": "env + JSON",
+      "row": 0,
+      "col": 3,
+      "size": [168, 72],
+      "sources": [
+        { "path": "src/lib/settings/service.ts", "line": 189, "end_line": 194, "label": "SettingsService" },
+        { "path": "src/lib/settings/service.ts", "line": 414, "end_line": 417, "label": "getSettingsService" }
+      ]
+    },
+    {
+      "id": "notion-adapter",
+      "type": "backend",
+      "label": "NotionLeadRepository",
+      "sublabel": "LeadRepository",
+      "row": 1,
+      "col": 3,
+      "size": [168, 72],
+      "sources": [
+        { "path": "src/lib/repository/lead-repository.ts", "line": 3, "end_line": 17, "label": "LeadRepository" },
+        { "path": "src/lib/notion/notion-lead-repository.ts", "line": 52, "end_line": 68, "label": "list()" },
+        { "path": "src/lib/notion/client.ts", "line": 11, "end_line": 21, "label": "getNotionClient" }
+      ]
+    },
+    {
+      "id": "notion",
+      "type": "database",
+      "label": "Notion",
+      "sublabel": "fuente de verdad",
+      "brand": "notion",
+      "row": 1,
+      "col": 4,
+      "size": [160, 72]
+    },
+    {
+      "id": "automations",
+      "type": "backend",
+      "label": "N8nClient",
+      "sublabel": "fire-and-forget",
+      "row": 2,
+      "col": 2,
+      "size": [160, 72],
+      "sources": [
+        { "path": "src/lib/automations/dispatch.ts", "line": 53, "end_line": 63, "label": "dispatchLeadCreated" },
+        { "path": "src/lib/automations/get-client.ts", "line": 11, "end_line": 18, "label": "getAutomationClient" },
+        { "path": "src/lib/n8n/client.ts", "line": 118, "end_line": 138, "label": "triggerWebhook" }
+      ]
+    },
+    {
+      "id": "n8n",
+      "type": "external",
+      "label": "n8n",
+      "sublabel": "webhooks",
+      "row": 2,
+      "col": 4,
+      "size": [160, 72]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Leads_CRM · Next.js",
+      "wraps": ["ui", "middleware", "api", "settings", "notion-adapter", "automations"]
+    }
+  ],
+  "connections": [
+    { "id": "asesor-ui", "from": "asesor", "to": "ui", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "middleware-ui", "from": "middleware", "to": "ui", "label": "AUTH_DISABLED", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "ui-api", "from": "ui", "to": "api", "label": "/api/*" },
+    { "id": "api-adapter", "from": "api", "to": "notion-adapter", "label": "list / update" },
+    { "id": "adapter-notion", "from": "notion-adapter", "to": "notion", "label": "dataSources.query", "labelAt": [936, 358] },
+    { "id": "api-automations", "from": "api", "to": "automations", "label": "tras persistir", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "automations-n8n", "from": "automations", "to": "n8n", "label": "POST webhook", "variant": "dashed" },
+    { "id": "settings-adapter", "from": "settings", "to": "notion-adapter", "label": "NOTION_TOKEN", "fromSide": "bottom", "toSide": "top", "labelAt": [820, 166] }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Cliente",
+      "items": [
+        "La UI llama a /api/*; nunca recibe NOTION_TOKEN",
+        "Zustand guarda filtros y sync; Notion sigue siendo la fuente de verdad"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Persistencia",
+      "items": [
+        "LeadRepository es el contrato; NotionLeadRepository es el adaptador",
+        "Escrituras van a pages.update y no a una base local"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "n8n",
+      "items": [
+        "Tras un alta o PATCH, dispatchLeadCreated/Updated dispara en segundo plano",
+        "Un error de webhook no revierte la persistencia en Notion"
+      ]
+    }
+  ]
+}
