@@ -11,6 +11,7 @@ Ambos usan `analyzeBusinessPains` → `createGroqCompletion` (`src/lib/ai/groq-c
 `src/lib/ai/pain-analysis.ts` es parse/formato usable en el cliente.
 
 Persistencia: Notion `Análisis IA` (`aiAnalysis`).  
+Actividad (timeline): tipo `ai_analyzed` (mismo token en código y PR; no `ai_analysis`).  
 Automatización: `dispatchLeadAnalyzed` → webhook `lead_analyzed` (best-effort; no falla el 200).
 
 ---
