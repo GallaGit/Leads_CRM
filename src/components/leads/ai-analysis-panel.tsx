@@ -1,3 +1,4 @@
+import type { Ref } from "react";
 import { Button } from "@/components/ui/button";
 import {
   PainAnalysisBlocks,
@@ -11,15 +12,17 @@ export function AiAnalysisPanel({
   empty,
   analysis,
   onRetry,
+  sectionRef,
 }: {
   analyzing: boolean;
   error: string | null;
   empty: boolean;
   analysis: PainAnalysis | null;
   onRetry: () => void;
+  sectionRef?: Ref<HTMLElement>;
 }) {
   return (
-    <section>
+    <section ref={sectionRef}>
       <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
         Dolores
       </h3>
