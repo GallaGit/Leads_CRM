@@ -111,22 +111,23 @@ No renombrar esos encabezados manualmente: el parser los usa como delimitadores.
 
 ### Workflow actual
 
-El workflow inspeccionado se llama `Leads Asesorias Valencia`.
+El workflow se llama `Leads Asesorias Valencia` (alineado con Leads_CRM el 2026-09-10).
 
 Su flujo actual:
 
 ```mermaid
 flowchart LR
-  Trigger[Manual_o_Semanal] --> Config[Config_busqueda]
+  Trigger[Manual_o_Semanal] --> Config[Config_3_10]
   Config --> Maps[SerpAPI_Maps]
   Maps --> Normalize[Normalizar]
-  Normalize --> Existing[Leer_Notion]
-  Existing --> Dedupe[Filtrar_duplicados]
+  Normalize --> Existing[Leer_Notion_activos]
+  Existing --> Archived[Buscar_archivados]
+  Archived --> Dedupe[Filtrar_duplicados]
   Dedupe --> Website[Leer_web]
   Website --> Extract[Groq_extrae_ficha]
   Extract --> Score[Calcular_score]
-  Score --> Email[Groq_redacta_email]
-  Email --> Save[Crear_en_Notion]
+  Score --> Email[Groq_email_plano]
+  Email --> Save[Notion_Nuevo]
 ```
 
 Características:
@@ -134,21 +135,24 @@ Características:
 - búsqueda en Google Maps mediante SerpAPI;
 - radio aproximado de 30 km alrededor de Valencia;
 - exclusión de grandes consultoras;
-- deduplicación exacta por nombre, dominio y teléfono;
+- deduplicación por nombre, dominio, teléfono y email (activos + páginas archivadas recientes vía búsqueda Notion);
 - extracción desde la web;
 - estimación de empleados;
-- generación de email;
-- creación del lead en Notion.
+- email en **texto plano** (sin HTML/`<br>`);
+- creación del lead en Notion **solo con propiedades** (cuerpo vacío: `Notas`/`Actividad` los escribe Leads_CRM);
+- `Origen` = `n8n`; no rellena `Favorito` ni `Análisis IA`.
 
 ### Estado de entrada
 
-El estado acordado es `Pendiente revisar`.
+El workflow escribe exactamente `Nuevo`. Todos los leads que llegan de n8n entran en ese estado. No usa `Pendiente` legacy ni pasa a `Email preparado` aunque haya borrador.
 
-Si una versión antigua del workflow sigue escribiendo `Pendiente`, el mapper lo leerá correctamente, pero conviene actualizar n8n para escribir el valor nuevo.
+El mapper de Leads_CRM sigue aceptando `Pendiente` por compatibilidad con filas antiguas.
 
-### Divergencia de empleados
+### Rango de empleados (operativo)
 
-El workflow inspeccionado utiliza 3–10 empleados. El ICP estratégico documentado en `Nicho` utiliza 5–30. Esta configuración debe decidirse y alinearse en n8n; Leads_CRM admite ambos mediante filtros.
+Decisión operativa (2026-09-10): el filtro SerpAPI / cualificación en n8n permanece en **3–10** empleados (`empMin`/`empMax` en Config busqueda).
+
+El ICP estratégico de negocio sigue siendo **5–30**. Leads_CRM admite ambos vía filtros; `LeadScorer` puntúa el ideal 5–30 (parcial 3–4 y 31–50). El score que escribe n8n usa su propia fórmula; **Recalcular scores** en la app puede pisarlo con la fórmula de Leads_CRM.
 
 ### Webhooks
 
@@ -167,7 +171,7 @@ N8N_WEBHOOK_GENERAR_EMAIL=
 N8N_WEBHOOK_EJECUTAR=
 ```
 
-La capa está preparada (`N8nClient.triggerWebhook` + métodos `notifyLeadCreated/Updated/Analyzed`), pero no se añadieron triggers al workflow. No rellenes URLs hasta que existan endpoints n8n protegidos. Settings puede guardar overrides en `data/settings.local.json` (gitignored); el navegador solo ve previews enmascarados.
+La capa está preparada (`N8nClient.triggerWebhook` + métodos `notifyLeadCreated/Updated/Analyzed`), pero **no** se añadieron triggers al workflow (decisión #12 / v1). No rellenes URLs en Automations ni en `.env` hasta que existan endpoints n8n protegidos. La captación se lanza con Manual o Cron dentro de n8n; Leads_CRM solo sincroniza Notion. Settings puede guardar overrides en `data/settings.local.json` (gitignored); el navegador solo ve previews enmascarados.
 
 ## SerpAPI
 

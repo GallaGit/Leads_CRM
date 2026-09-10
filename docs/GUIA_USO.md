@@ -79,7 +79,12 @@ Si aparece `NOTION_TOKEN no configurado`, revisa `.env.local` y reinicia `npm ru
 
 ### Daily Work
 
-En `/inbox` verás las colas del día (pendientes, datos incompletos, emails listos, follow-ups vencidos, posibles duplicados). Al abrir una cola se aplica el filtro en Leads y se abre el primer lead.
+En `/inbox` verás las colas del día:
+
+- **Nuevos y pendientes** — estado `Nuevo` o `Pendiente revisar` (los leads de n8n entran en `Nuevo`);
+- faltan datos, emails listos (incluye borrador en `Nuevo`), follow-ups vencidos, posibles duplicados.
+
+Al abrir una cola se aplica el filtro en Leads y se abre el primer lead.
 
 ### Kanban
 
@@ -131,11 +136,13 @@ Ejemplo:
 
 ```text
 Provincia = Valencia
-Y Empleados >= 5
-Y Empleados <= 30
-Y Estado = Pendiente revisar
+Y Empleados >= 3
+Y Empleados <= 10
+Y Estado = Nuevo
 Y Con email
 ```
+
+(El filtro operativo de n8n es 3–10; el ICP estratégico de negocio sigue siendo 5–30.)
 
 Pulsa **Limpiar** para quitar todos los filtros.
 
@@ -237,11 +244,11 @@ En `/settings` puedes revisar y completar Notion, n8n, IA (Groq) y SerpAPI.
 
 ## Automations
 
-En `/automations` hay tres eventos: Nuevo Lead, Lead actualizado y Lead analizado.
+En `/automations` hay tres eventos reservados: Nuevo Lead, Lead actualizado y Lead analizado. La capa HTTP está lista, pero **en v1 el workflow de captación no tiene esos triggers**.
 
-- Activa o desactiva cada uno.
-- Pega la URL del webhook (o déjala en `.env`).
-- **Probar** envía un payload de ejemplo. Si el toggle está **Activa** y hay webhook, el alta y las ediciones de leads también disparan el evento (best-effort; un error de n8n no impide guardar en Notion). El workflow n8n actual no incluye estos triggers.
+- La captación se lanza en n8n (Manual o semanal), no desde Leads_CRM.
+- No actives los toggles ni pegues URLs en v1.
+- Si en una fase posterior hubiera endpoint, **Probar** enviaría un payload de ejemplo; con toggle activo el alta/edición también dispararía (best-effort; un error de n8n no impide guardar en Notion).
 
 ## Tema
 
@@ -249,7 +256,7 @@ El botón de la esquina superior cambia entre tema claro y oscuro. El diseño es
 
 ## Estado de las demás secciones
 
-Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations configura webhooks n8n y, si están activos, la app los dispara en alta/edición (best-effort). El workflow n8n no incluye esos triggers y el análisis IA de dolores sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
+Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operativos. Settings permite guardar y probar integraciones (secretos enmascarados). Automations muestra la capa de webhooks n8n (sin trigger en el workflow en v1). El análisis IA de dolores sigue pendiente. Consulta [`ESTADO_IMPLEMENTACION.md`](./ESTADO_IMPLEMENTACION.md).
 
 ## Diagnóstico rápido
 
@@ -275,7 +282,7 @@ Statistics (`/stats`) y Duplicados (`/duplicates`, merge incluido) están operat
 
 ### n8n muestra “Sin webhook”
 
-Configura `N8N_WEBHOOK_LEAD_*` (o los alias `N8N_WEBHOOK_BUSCAR_LEADS` / `ANALIZAR_LEAD` / …) o pega la URL en Automations. El workflow actual no fue modificado para añadir triggers.
+Es el comportamiento esperado en v1: no hay endpoints de webhook en el workflow de captación. No configures `N8N_WEBHOOK_LEAD_*` hasta una fase posterior. Para probar la conexión del servicio usa Settings → n8n → **Probar conexión** (`N8N_BASE_URL`).
 
 ## Calidad
 

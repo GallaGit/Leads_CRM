@@ -108,9 +108,10 @@ export function AutomationsPanel() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-[var(--muted-fg)]">
-        Solo configuración de webhooks. Leads_CRM no edita el workflow de n8n.
-        Activa cada evento, pega la URL y usa <strong>Probar</strong> para
-        enviar un payload de ejemplo.
+        La captación se lanza en n8n (Manual o semanal), no desde esta pantalla.
+        Leads_CRM no edita el workflow. En v1 no actives los toggles ni pegues
+        URLs: la capa de webhooks está lista, pero el workflow no tiene esos
+        triggers.
       </p>
       {items.map((item) => {
         const configured = item.webhook.configured;

@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Fecha de revisión: 2026-09-07 (Fase 7 parcial: SettingsService + N8nClient + UI Integraciones/Automations). Revisión documental previa 2026-09-07: el repositorio está en GitHub (`GallaGit/Leads_CRM`, rama `master`); el merge de duplicados ya está en código (ver Disponible).
+Fecha de revisión: 2026-09-10 (alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; filtro 3–10 operativo; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07 (Fase 7 parcial: SettingsService + N8nClient + UI Integraciones/Automations). El repositorio está en GitHub (`GallaGit/Leads_CRM`, rama `master`); el merge de duplicados ya está en código (ver Disponible).
 
 Este documento describe el comportamiento del código actual. No sustituye a [`DECISIONES.md`](./DECISIONES.md) ni al [`ROADMAP.md`](./ROADMAP.md).
 
@@ -96,7 +96,7 @@ La página principal sincroniza leads al cargar, muestra KPIs clicables hacia co
 
 ### Daily Work
 
-`/inbox` lista colas (pendiente revisar, faltan datos, emails listos, follow-up vencido, duplicados). Abrir una cola navega a `/leads?queue=…&lead=…`.
+`/inbox` lista colas: **Nuevos y pendientes** (`Nuevo` + `Pendiente revisar`), faltan datos, emails listos (borrador en `Nuevo`, `Pendiente revisar`, `Validado` o estado `Email preparado`), follow-up vencido, duplicados. Abrir una cola navega a `/leads?queue=…&lead=…`.
 
 ### Email
 
@@ -104,7 +104,7 @@ Workbench en `/email` para revisar borradores. El mismo editor vive en el drawer
 
 ### Automations
 
-Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL de webhook enmascarada, activa/inactiva y botón **Probar**. Tras persistir en Notion, el alta (`POST /api/leads`) y las actualizaciones (`PATCH` individual y masiva; fusión si rellena campos) disparan el webhook correspondiente en segundo plano si el toggle está activo y hay URL. Un fallo de n8n se registra y no revierte el lead. `notifyLeadAnalyzed` sigue sin ciclo de vida (no hay acción de dolores IA).
+Página de configuración (no edita workflows n8n): toggles Nuevo Lead / Lead actualizado / Lead analizado, URL enmascarada y botón **Probar**. La capa dispara en segundo plano tras alta/PATCH **si** hay toggle activo y URL; en v1 no hay triggers en el workflow ni URLs configuradas (decisión #12). Un fallo de n8n no revierte el lead. `notifyLeadAnalyzed` sin ciclo de vida (no hay acción de dolores IA).
 
 ### Settings
 
@@ -174,11 +174,11 @@ Detalle de la sesión: [`SESION-2026-09-04-dev-pass.md`](./SESION-2026-09-04-dev
 
 ### ICP
 
-Las notas estratégicas definen 5–30 empleados; n8n está configurado en 3–10. Leads_CRM no resuelve esa decisión y permite filtrar cualquier rango.
+Las notas estratégicas definen 5–30 empleados; n8n opera en **3–10** (decisión operativa 2026-09-10). Leads_CRM permite filtrar cualquier rango; el scorer de la app favorece 5–30.
 
 ### n8n y estado
 
-La configuración histórica de n8n puede seguir escribiendo `Pendiente`. Leads_CRM lo normaliza a `Pendiente revisar`, pero n8n debe actualizarse para evitar depender indefinidamente de compatibilidad legacy.
+El workflow `Leads Asesorias Valencia` escribe `Nuevo`, `Origen=n8n`, email plano y cuerpo vacío. La app mantiene compatibilidad de lectura con `Pendiente` legacy. Daily Work incluye esos leads en “Nuevos y pendientes” y, si tienen borrador, en “Emails listos”. Webhooks `lead.*` siguen fuera de v1 (solo cliente en Leads_CRM; no pegar URL).
 
 ### Comentarios Notion
 

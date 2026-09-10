@@ -31,13 +31,13 @@ export const AUTOMATION_CATALOG: Record<
   lead_created: {
     name: "Nuevo Lead",
     description:
-      "Webhook al crear un lead. El workflow n8n actual no incluye este trigger; configura la URL y usa Probar.",
+      "Reserva post-alta en el CRM (alias buscar leads). En v1 el workflow de captación no tiene este trigger: no pegues URL ni actives el toggle.",
     envKeys: ["N8N_WEBHOOK_LEAD_CREATED", "N8N_WEBHOOK_BUSCAR_LEADS"],
   },
   lead_updated: {
     name: "Lead actualizado",
     description:
-      "Webhook al actualizar un lead (estado, notas u otros campos). Triggers pendientes en n8n.",
+      "Sin flujo n8n en v1. La capa queda lista; no configures webhook hasta una fase posterior.",
     envKeys: [
       "N8N_WEBHOOK_LEAD_UPDATED",
       "N8N_WEBHOOK_EJECUTAR",
@@ -47,7 +47,7 @@ export const AUTOMATION_CATALOG: Record<
   lead_analyzed: {
     name: "Lead analizado",
     description:
-      "Webhook tras analizar un lead. La acción de dolores IA no forma parte de esta fase.",
+      "Sin flujo n8n en v1. Depende de Detectar dolores (aún pendiente).",
     envKeys: ["N8N_WEBHOOK_LEAD_ANALYZED", "N8N_WEBHOOK_ANALIZAR_LEAD"],
   },
 };
