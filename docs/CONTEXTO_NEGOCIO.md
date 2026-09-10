@@ -56,9 +56,9 @@ La investigación estratégica define como objetivo empresas pequeñas o mediana
 
 ### Divergencia operativa conocida
 
-El workflow n8n inspeccionado está configurado actualmente para buscar empresas de **3 a 10 empleados**, mientras que la investigación de negocio define un rango estratégico de **5 a 30**.
+Decisión operativa (2026-09-10): n8n busca empresas de **3 a 10 empleados**. La investigación de negocio mantiene el ICP estratégico de **5 a 30**.
 
-Leads_CRM no fuerza ninguno de esos rangos: permite filtrar por número de empleados. La configuración del workflow debe alinearse con el ICP cuando se decida el rango operativo definitivo.
+No son el mismo número a propósito: captación operativa más estrecha en n8n; cualificación y scoring en Leads_CRM usan filtros y pesos que favorecen 5–30. Se puede ampliar el filtro n8n más adelante sin cambiar el CRM.
 
 ## Problemas que se quieren detectar
 
@@ -125,7 +125,7 @@ El usuario trabaja desde Leads_CRM:
 
 ### Contacto
 
-El envío automático no forma parte de la implementación actual. El email preparado puede revisarse y copiarse desde el panel del lead. La capa de webhooks n8n está preparada para fases posteriores.
+El envío automático no forma parte de la implementación actual. El email preparado puede revisarse y copiarse desde el panel del lead. Los leads capturados por n8n entran en Notion como `Nuevo` (con borrador en texto plano) y se cualifican en Leads_CRM tras sincronizar. La capa de webhooks CRM → n8n está preparada en código pero fuera de v1.
 
 ## Objetivo de negocio inicial
 

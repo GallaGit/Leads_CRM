@@ -45,7 +45,9 @@ export function matchesWorkQueue(lead: Lead, queueId: WorkQueueId, duplicateIds:
       if (lead.status === "Email preparado") return true;
       return Boolean(
         lead.emailBody?.trim() &&
-          (lead.status === "Validado" || lead.status === "Pendiente revisar"),
+          (lead.status === "Nuevo" ||
+            lead.status === "Validado" ||
+            lead.status === "Pendiente revisar"),
       );
     case "followup_overdue": {
       if (!lead.nextFollowUp) return false;
@@ -64,8 +66,8 @@ const QUEUE_META: Record<
   { title: string; description: string }
 > = {
   pendiente_revisar: {
-    title: "Pendiente revisar",
-    description: "Leads nuevos o pendientes de cualificar",
+    title: "Nuevos y pendientes",
+    description: "Estado Nuevo o Pendiente revisar (cualificar)",
   },
   faltan_datos: {
     title: "Faltan datos",
@@ -73,7 +75,8 @@ const QUEUE_META: Record<
   },
   emails_listos: {
     title: "Emails listos",
-    description: "Borradores para revisar o marcar preparados",
+    description:
+      "Borradores en Nuevo, Pendiente revisar, Validado o Email preparado",
   },
   followup_overdue: {
     title: "Follow-up vencido",

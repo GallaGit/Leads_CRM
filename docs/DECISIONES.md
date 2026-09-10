@@ -13,7 +13,7 @@ La aplicación Next.js vive en la raíz de este repositorio. Este documento es l
 | # | Tema | Decisión |
 |---|------|----------|
 | 1 | Pipeline | Exactamente 9 estados (ver §2). |
-| 2 | Leads de n8n | Entran en **Pendiente revisar**. Daily Work también los lista en “emails listos para revisar”. Leads_CRM **no** los pasa solo a **Email preparado**. |
+| 2 | Leads de n8n | Entran en **Nuevo**. Daily Work los lista en la cola de pendientes/nuevos y, si ya tienen borrador, en “emails listos para revisar”. Leads_CRM **no** los pasa solo a **Email preparado**. |
 | 3 | Tags | **Sin tags en v1.** No crear propiedad `Tags`. No reutilizar `Servicios` como tags. |
 | 4 | Favorito | **Sí.** Nueva checkbox Notion `Favorito`, persistida en Notion (no solo local). |
 | 5 | Responsable | **Omitido en v1** (un solo usuario). No crear propiedad. |
@@ -58,7 +58,7 @@ Estos nombres deben usarse de forma idéntica en lista, Kanban, filtros, KPIs y 
 | `Descartado` | Mantener |
 | — | Añadir: `Nuevo`, `Validado`, `Email preparado`, `Respondió`, `Reunión` |
 
-**Compatibilidad n8n:** hasta actualizar el workflow, el mapper de Leads_CRM acepta `Pendiente` y `Pendiente revisar`, y **persiste siempre** el nombre nuevo (`Pendiente revisar`). Cuando n8n se actualice, debe escribir `Pendiente revisar`.
+**Entrada n8n:** el workflow escribe `Nuevo` (actualizado 2026-09-10). El mapper de Leads_CRM sigue aceptando `Pendiente` legacy al leer y lo normaliza a `Pendiente revisar`; las escrituras de la app usan siempre los 9 nombres canónicos.
 
 ---
 
@@ -195,8 +195,9 @@ Al leer `Email generado` / `Asunto email`:
 ### n8n
 
 - Cliente de webhooks + Settings con URLs configurables vía env.  
-- No modificar el workflow `Leads Asesorias Valencia` en esta fase.  
-- Estado de entrada previsto cuando se actualice n8n: `Pendiente revisar`.
+- Workflow `Leads Asesorias Valencia` alineado (2026-09-10): estado `Nuevo`, `Origen=n8n`, email plano, cuerpo vacío, dedupe con email/archivados.  
+- Filtro operativo de empleados: **3–10** (ICP estratégico 5–30 sin cambiar en n8n).  
+- **No** añadir triggers webhook al workflow en v1 (decisión #12).
 
 ### Archivo y duplicados
 

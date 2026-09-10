@@ -6,6 +6,8 @@
 
 No reabrir las decisiones de producto salvo petición explícita. Notion sigue siendo la fuente de verdad; no introducir Supabase como DB primaria en estas fases.
 
+**Alineación n8n (2026-09-10):** el workflow de captación escribe estado `Nuevo`, `Origen=n8n`, email plano y cuerpo vacío; filtro operativo 3–10 empleados. Detalle en [`INTEGRACIONES.md`](./INTEGRACIONES.md). Webhooks CRM → n8n siguen fuera de v1 (decisión #12).
+
 ---
 
 ## Fase 0 — Validación (hecha)
@@ -58,7 +60,7 @@ Objetivo: shell usable, tema Linear-like, env seguro, tipos de dominio, cliente 
 ## Fase 4 — Home + Daily Work (Prompt 3)
 
 - [x] KPIs: encontrados, pendientes, validados, emails preparados/enviados, respuestas, reuniones, clientes, conversion rate
-- [x] Daily Work / Inbox: colas accionables (pendiente revisar, faltan datos, emails listos, follow-up overdue, duplicados, etc.)
+- [x] Daily Work / Inbox: colas accionables (`Nuevo` + `Pendiente revisar`, faltan datos, emails listos incl. borrador en `Nuevo`, follow-up overdue, duplicados, etc.)
 - [x] Deep links a filtros + abrir primer lead
 
 ---
@@ -84,7 +86,7 @@ Objetivo: shell usable, tema Linear-like, env seguro, tipos de dominio, cliente 
 ## Fase 7 — AI + n8n client + Settings (Prompt 3)
 
 - [ ] Acción **Detectar dolores del negocio** → propiedad `Análisis IA` (evidencia / inferencia / especulación)
-- [x] `N8nClient` + Automations UI (webhooks configurables; la app dispara en alta/edición si el toggle está activo; el workflow n8n aún no tiene esos triggers)
+- [x] `N8nClient` + Automations UI (cliente listo; en v1 sin trigger en el workflow n8n — no pegar URL ni activar toggles)
 - [x] Settings: Notion, SerpAPI (referencia), AI, n8n URLs; tests de conexión sin exponer secretos
 - [x] Sync indicador completo (por integración: never / syncing / ok / error + lastSyncedAt)
 
