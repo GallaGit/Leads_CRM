@@ -31,7 +31,13 @@ export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
               ) : null}
             </div>
             {items.length > 0 ? (
-              <ul className="mt-1 space-y-1 text-[12.5px] text-[var(--fg)]">
+              <ul
+                className={
+                  key === "speculation"
+                    ? "mt-1 space-y-1 text-[12.5px] text-[var(--muted-fg)]"
+                    : "mt-1 space-y-1 text-[12.5px] text-[var(--fg)]"
+                }
+              >
                 {items.map((item) => (
                   <li key={item} className="break-words">
                     • {item}
