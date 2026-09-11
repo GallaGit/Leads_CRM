@@ -19,10 +19,15 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
+    env: {
+      ...process.env,
+      AUTH_DISABLED: 'true',
+      PORT: '3000',
+    },
   },
   expect: {
     toHaveScreenshot: { threshold: 0.2 },
