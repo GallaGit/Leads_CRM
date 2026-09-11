@@ -80,6 +80,7 @@ export function leadFromGrokBody(raw: unknown): Lead | null {
     status: normalizeStatus(asTrimmed(r.status)),
     lastActivity: asTrimmed(r.lastActivity),
     createdAt: asTrimmed(r.createdAt),
+    discoveredAt: asTrimmed(r.discoveredAt),
     notes: asTrimmed(r.notes),
     notesOverflow: asTrimmed(r.notesOverflow),
     emailSubject: asTrimmed(r.emailSubject),

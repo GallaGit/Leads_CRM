@@ -54,6 +54,7 @@ export interface Lead {
   status: LeadStatus;
   lastActivity: string | null;
   createdAt: string | null;
+  discoveredAt?: string | null;
   notes: string | null;
   notesOverflow: string | null;
   emailSubject: string | null;

@@ -52,7 +52,7 @@ function hasAnyEmail(lead: Lead): boolean {
   );
 }
 
-const scorers: Record<ScoreFactor, Scorer> = {
+export const scorers: Record<ScoreFactor, Scorer> = {
   hasEmail: (lead) => (hasAnyEmail(lead) ? SCORE_WEIGHTS.hasEmail : 0),
 
   hasPhone: (lead) =>

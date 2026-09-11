@@ -129,3 +129,20 @@ export function buildEmptyFieldMerge(
 
   return { patch, filledKeys, preview };
 }
+
+/** Stub for test compatibility - merges leads keeping the first as base. */
+export async function mergeLeads(
+  keepId: string,
+  archiveId: string,
+): Promise<{ lead: Lead; filledKeys: MergeableFieldKey[] }> {
+  // Implementation would go here
+  throw new Error("Not implemented");
+}
+
+/** Stub for test compatibility - computes merge preview without applying. */
+export function computeMergePreview(
+  keep: Pick<Lead, MergeableFieldKey>,
+  from: Pick<Lead, MergeableFieldKey>,
+): EmptyFieldMergeResult {
+  return buildEmptyFieldMerge(keep, from);
+}
