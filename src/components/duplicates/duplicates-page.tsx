@@ -251,7 +251,7 @@ export function DuplicatesPage() {
       <Topbar title="Duplicados" />
       <div className="min-h-0 flex-1 overflow-auto p-6">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-          <p className="max-w-2xl text-sm text-[var(--muted-fg)]">
+          <p className="max-w-2xl text-sm text-(--muted-fg)">
             Grupos con el mismo email, teléfono o dominio web (también nombre o
             dirección normalizados; incluye archivados). Elige conservar y
             archivar para comparar; la fusión solo rellena campos vacíos del
@@ -268,19 +268,19 @@ export function DuplicatesPage() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-[var(--muted-fg)]">Detectando duplicados…</p>
+          <p className="text-sm text-(--muted-fg)">Detectando duplicados…</p>
         ) : null}
         {error ? <p className="text-sm text-red-400">{error}</p> : null}
 
         {data && data.groups.length === 0 ? (
-          <p className="text-sm text-[var(--muted-fg)]">
+          <p className="text-sm text-(--muted-fg)">
             No hay grupos duplicados entre {data.scanned} leads escaneados.
           </p>
         ) : null}
 
         {data && data.groups.length > 0 ? (
           <>
-            <p className="mb-3 text-[12px] text-[var(--muted-fg)]">
+            <p className="mb-3 text-[12px] text-(--muted-fg)">
               {data.groupCount} grupo{data.groupCount === 1 ? "" : "s"} ·{" "}
               {data.leadCount} leads · {data.scanned} escaneados (con archivados)
             </p>
@@ -292,20 +292,20 @@ export function DuplicatesPage() {
                 return (
                   <section
                     key={group.id}
-                    className="rounded-lg border border-[var(--border)] bg-[var(--panel)] p-4"
+                    className="rounded-lg border border-(--border) bg-(--panel) p-4"
                   >
                     <div className="flex flex-wrap gap-1.5">
                       {group.reasons.map((reason) => (
                         <span
                           key={`${reason.code}:${reason.value}`}
-                          className="rounded-md bg-[var(--muted)] px-2 py-0.5 text-[11px] text-[var(--muted-fg)]"
+                          className="rounded-md bg-(--muted) px-2 py-0.5 text-[11px] text-(--muted-fg)"
                           title={reason.value}
                         >
                           {reasonChip(reason)}
                         </span>
                       ))}
                     </div>
-                    <ul className="mt-3 divide-y divide-[var(--border)]">
+                    <ul className="mt-3 divide-y divide-(--border)">
                       {group.leads.map((lead) => {
                         const isKeep = keepId === lead.id;
                         const isArchive = archiveId === lead.id;
@@ -317,11 +317,11 @@ export function DuplicatesPage() {
                             <div className="min-w-0">
                               <Link
                                 href={`/leads?lead=${encodeURIComponent(lead.id)}`}
-                                className="text-sm font-medium hover:text-[var(--accent)]"
+                                className="text-sm font-medium hover:text-(--accent)"
                               >
                                 {lead.companyName || "Sin nombre"}
                               </Link>
-                              <div className="mt-0.5 text-[12px] text-[var(--muted-fg)]">
+                              <div className="mt-0.5 text-[12px] text-(--muted-fg)">
                                 {[lead.status, lead.city, lead.email, lead.phone]
                                   .filter(Boolean)
                                   .join(" · ")}
@@ -347,7 +347,7 @@ export function DuplicatesPage() {
                               </Button>
                               <Link
                                 href={`/leads?lead=${encodeURIComponent(lead.id)}`}
-                                className="px-1 text-[12px] text-[var(--accent)] hover:underline"
+                                className="px-1 text-[12px] text-(--accent) hover:underline"
                               >
                                 Abrir
                               </Link>
@@ -358,7 +358,7 @@ export function DuplicatesPage() {
                     </ul>
 
                     {isActive && keepId && archiveId ? (
-                      <div className="mt-4 rounded-md border border-[var(--border)] bg-[var(--bg)] p-3">
+                      <div className="mt-4 rounded-md border border-(--border) bg-(--bg) p-3">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <h3 className="text-sm font-semibold">
                             Comparar · conservar «
@@ -377,7 +377,7 @@ export function DuplicatesPage() {
                         </div>
 
                         {pairLoading ? (
-                          <p className="mt-2 text-[12px] text-[var(--muted-fg)]">
+                          <p className="mt-2 text-[12px] text-(--muted-fg)">
                             Cargando campos…
                           </p>
                         ) : null}
@@ -387,7 +387,7 @@ export function DuplicatesPage() {
 
                         {activePairReady && mergePreview ? (
                           <>
-                            <p className="mt-2 text-[12px] text-[var(--muted-fg)]">
+                            <p className="mt-2 text-[12px] text-(--muted-fg)">
                               {mergePreview.filledKeys.length === 0
                                 ? "Ningún campo vacío se rellenaría; el origen solo se archivaría."
                                 : `${mergePreview.filledKeys.length} campo${
@@ -407,7 +407,7 @@ export function DuplicatesPage() {
                             <div className="mt-3 overflow-x-auto">
                               <table className="w-full min-w-[32rem] border-collapse text-left text-[12px]">
                                 <thead>
-                                  <tr className="border-b border-[var(--border)] text-[var(--muted-fg)]">
+                                  <tr className="border-b border-(--border) text-(--muted-fg)">
                                     <th className="py-1.5 pr-2 font-medium">
                                       Campo
                                     </th>
@@ -426,26 +426,26 @@ export function DuplicatesPage() {
                                       key={row.key}
                                       className={
                                         row.willFill
-                                          ? "bg-[var(--muted)]/40"
+                                          ? "bg-(--muted)/40"
                                           : undefined
                                       }
                                     >
                                       <td className="py-1.5 pr-2 align-top font-medium">
                                         {row.label}
                                       </td>
-                                      <td className="max-w-[14rem] truncate py-1.5 pr-2 align-top text-[var(--muted-fg)]">
+                                      <td className="max-w-[14rem] truncate py-1.5 pr-2 align-top text-(--muted-fg)">
                                         {row.keepValue}
                                       </td>
-                                      <td className="max-w-[14rem] truncate py-1.5 pr-2 align-top text-[var(--muted-fg)]">
+                                      <td className="max-w-[14rem] truncate py-1.5 pr-2 align-top text-(--muted-fg)">
                                         {row.archiveValue}
                                       </td>
                                       <td className="py-1.5 align-top">
                                         {row.willFill ? (
-                                          <span className="text-[var(--accent)]">
+                                          <span className="text-(--accent)">
                                             Se rellena
                                           </span>
                                         ) : (
-                                          <span className="text-[var(--muted-fg)]">
+                                          <span className="text-(--muted-fg)">
                                             —
                                           </span>
                                         )}
@@ -491,7 +491,7 @@ export function DuplicatesPage() {
                         ) : null}
                       </div>
                     ) : isActive && (keepId || archiveId) ? (
-                      <p className="mt-3 text-[12px] text-[var(--muted-fg)]">
+                      <p className="mt-3 text-[12px] text-(--muted-fg)">
                         Elige un lead para conservar y otro para archivar /
                         fusionar.
                       </p>

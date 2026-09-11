@@ -54,6 +54,7 @@ export interface Lead {
   status: LeadStatus;
   lastActivity: string | null;
   createdAt: string | null;
+  discoveredAt?: string | null;
   notes: string | null;
   notesOverflow: string | null;
   emailSubject: string | null;
@@ -157,10 +158,15 @@ export interface LeadFilters {
   favorite?: boolean | null;
 }
 
+export function isLeadStatus(value: unknown): value is LeadStatus {
+  return (
+    typeof value === "string" &&
+    (LEAD_STATUSES as readonly string[]).includes(value)
+  );
+}
+
 export function normalizeStatus(raw: string | null | undefined): LeadStatus {
   if (!raw) return "Nuevo";
-  if ((LEAD_STATUSES as readonly string[]).includes(raw)) {
-    return raw as LeadStatus;
-  }
+  if (isLeadStatus(raw)) return raw;
   return LEGACY_STATUS_MAP[raw] ?? "Pendiente revisar";
 }

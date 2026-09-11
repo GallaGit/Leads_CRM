@@ -66,7 +66,7 @@ export function SettingsIntegrations() {
   });
 
   if (query.isPending) {
-    return <p className="text-sm text-[var(--muted-fg)]">Cargando…</p>;
+    return <p className="text-sm text-(--muted-fg)">Cargando…</p>;
   }
   if (query.isError || !query.data) {
     return (
@@ -157,14 +157,14 @@ function SettingsForm({ settings: initial }: { settings: PublicSettings }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[var(--muted-fg)]">
+      <p className="text-sm text-(--muted-fg)">
         Secretos solo en el servidor. Los valores se mezclan desde{" "}
         <code>.env.local</code> (arranque) y{" "}
         <code>data/settings.local.json</code> (cambios de esta pantalla). El
         navegador solo ve si está configurado y las últimas 4 caracteres.
       </p>
 
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--panel)] px-4 py-3 text-sm">
+      <div className="rounded-lg border border-(--border) bg-(--panel) px-4 py-3 text-sm">
         <div className="flex items-center justify-between">
           <span>Auth desactivado (local)</span>
           <span
@@ -177,7 +177,7 @@ function SettingsForm({ settings: initial }: { settings: PublicSettings }) {
         </div>
       </div>
 
-      <section className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel)] p-4">
+      <section className="space-y-3 rounded-lg border border-(--border) bg-(--panel) p-4">
         <Header
           title="Notion"
           configured={settings.notion.configured}
@@ -244,7 +244,7 @@ function SettingsForm({ settings: initial }: { settings: PublicSettings }) {
         />
       </section>
 
-      <section className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel)] p-4">
+      <section className="space-y-3 rounded-lg border border-(--border) bg-(--panel) p-4">
         <Header
           title="n8n"
           configured={settings.n8n.configured}
@@ -324,7 +324,7 @@ function SettingsForm({ settings: initial }: { settings: PublicSettings }) {
         />
       </section>
 
-      <section className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel)] p-4">
+      <section className="space-y-3 rounded-lg border border-(--border) bg-(--panel) p-4">
         <Header
           title="IA"
           configured={settings.ai.configured}
@@ -334,13 +334,13 @@ function SettingsForm({ settings: initial }: { settings: PublicSettings }) {
         <div>
           <label
             htmlFor="ai-provider"
-            className="mb-1 block text-[11px] font-medium text-[var(--muted-fg)]"
+            className="mb-1 block text-[11px] font-medium text-(--muted-fg)"
           >
             Proveedor
           </label>
           <select
             id="ai-provider"
-            className="flex h-8 w-full rounded-md border border-[var(--border)] bg-[var(--bg)] px-2.5 text-sm text-[var(--fg)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)]"
+            className="flex h-8 w-full rounded-md border border-(--border) bg-(--bg) px-2.5 text-sm text-(--fg) focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--ring)"
             value={draft.aiProvider}
             onChange={(e) =>
               setDraft((d) => ({ ...d, aiProvider: e.target.value }))
@@ -403,7 +403,7 @@ function SettingsForm({ settings: initial }: { settings: PublicSettings }) {
         />
       </section>
 
-      <section className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel)] p-4">
+      <section className="space-y-3 rounded-lg border border-(--border) bg-(--panel) p-4">
         <Header
           title="SerpAPI"
           configured={settings.serpapi.configured}
@@ -464,7 +464,7 @@ function Header({
     <div className="flex flex-wrap items-start justify-between gap-2">
       <div>
         <h2 className="text-[13px] font-medium tracking-tight">{title}</h2>
-        <p className="text-[11px] text-[var(--muted-fg)]">
+        <p className="text-[11px] text-(--muted-fg)">
           {configured ? "Credenciales presentes" : "Pendiente de configurar"}
         </p>
       </div>
@@ -512,7 +512,7 @@ function ClearLink({
     <button
       type="button"
       onClick={onClick}
-      className="text-[11px] text-[var(--muted-fg)] underline-offset-2 hover:text-[var(--fg)] hover:underline"
+      className="text-[11px] text-(--muted-fg) underline-offset-2 hover:text-(--fg) hover:underline"
     >
       {active
         ? "Al guardar se restaurará el valor de .env"

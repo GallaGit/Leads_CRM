@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Trash2, Plus, MoreHorizontal, Archive } from "lucide-react";
+import { Star, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Topbar } from "@/components/layout/topbar";
 import { useEnsureLeadsSynced } from "@/hooks/use-ensure-leads-synced";
@@ -79,11 +80,10 @@ function KanbanCard({ lead, draggingId, onDragStart, onDragEnd, onClick }: Kanba
 }
 
 interface DropIndicatorProps {
-  column: LeadStatus;
   isOver: boolean;
 }
 
-function DropIndicator({ column, isOver }: DropIndicatorProps) {
+function DropIndicator({ isOver }: DropIndicatorProps) {
   const reduced = useReducedMotion();
 
   return (
@@ -100,11 +100,10 @@ function DropIndicator({ column, isOver }: DropIndicatorProps) {
 }
 
 interface AddCardProps {
-  column: LeadStatus;
   onAdd: (title: string) => void;
 }
 
-function AddCard({ column, onAdd }: AddCardProps) {
+function AddCard({ onAdd }: AddCardProps) {
   const [showing, setShowing] = useState(false);
   const [text, setText] = useState("");
   const reduced = useReducedMotion();
@@ -150,7 +149,7 @@ function AddCard({ column, onAdd }: AddCardProps) {
         autoFocus
         placeholder="Título de la tarjeta..."
         rows={2}
-        className="w-full min-h-[60px] resize-none rounded border border-gris-300 dark:border-gris-600 bg-blanco dark:bg-gris-800 px-3 py-2 text-sm text-grafito dark:text-gris-100 placeholder:text-gris-400 focus:outline-none focus:ring-2 focus:ring-rojo focus:border-transparent"
+        className="w-full min-h-15 resize-none rounded border border-gris-300 dark:border-gris-600 bg-blanco dark:bg-gris-800 px-3 py-2 text-sm text-grafito dark:text-gris-100 placeholder:text-gris-400 focus:outline-none focus:ring-2 focus:ring-rojo focus:border-transparent"
       />
       <div className="flex justify-end gap-2">
         <button
@@ -183,7 +182,6 @@ interface KanbanColumnProps {
   onDragLeave: () => void;
   onMoveLead: (leadId: string, status: LeadStatus) => void;
   onOpenLead: (lead: Lead) => void;
-  onArchiveLead: (leadId: string) => void;
 }
 
 function KanbanColumn({
@@ -197,7 +195,6 @@ function KanbanColumn({
   onDragLeave,
   onMoveLead,
   onOpenLead,
-  onArchiveLead,
 }: KanbanColumnProps) {
   const reduced = useReducedMotion();
   const isOver = overStatus === status;
@@ -228,7 +225,7 @@ function KanbanColumn({
         </span>
       </div>
 
-      <DropIndicator column={status} isOver={isOver} />
+      <DropIndicator isOver={isOver} />
 
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
         <AnimatePresence>
@@ -245,7 +242,6 @@ function KanbanColumn({
         </AnimatePresence>
 
         <AddCard
-          column={status}
           onAdd={(title) => {
             const newLead: Lead = {
               id: `temp-${Date.now()}`,
@@ -295,9 +291,9 @@ function KanbanColumn({
 
 export function KanbanBoard() {
   useEnsureLeadsSynced();
+  const router = useRouter();
   const leads = useUiStore((s) => s.leads);
   const upsertLead = useUiStore((s) => s.upsertLead);
-  const removeLead = useUiStore((s) => s.removeLead);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [overStatus, setOverStatus] = useState<LeadStatus | null>(null);
   const reduced = useReducedMotion();
@@ -356,21 +352,7 @@ export function KanbanBoard() {
   };
 
   const handleOpenLead = (lead: Lead) => {
-    window.location.href = `/leads?lead=${lead.id}`;
-  };
-
-  const handleArchiveLead = async (leadId: string) => {
-    const lead = leads.find((l) => l.id === leadId);
-    if (!lead) return;
-
-    upsertLead({ ...lead, archived: true });
-    try {
-      await patchStatus(leadId, lead.status);
-      toast.success("Lead archivado", { description: lead.companyName });
-    } catch (e) {
-      upsertLead(lead);
-      toast.error(e instanceof Error ? e.message : "Error al archivar");
-    }
+    router.push(`/leads?lead=${lead.id}`);
   };
 
   return (
@@ -396,7 +378,6 @@ export function KanbanBoard() {
               onDragLeave={handleDragLeave}
               onMoveLead={moveLead}
               onOpenLead={handleOpenLead}
-              onArchiveLead={handleArchiveLead}
             />
           ))}
         </motion.div>

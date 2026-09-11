@@ -67,7 +67,7 @@ function Label({
   return (
     <label
       htmlFor={htmlFor}
-      className="mb-1 block text-[11px] font-medium text-[var(--muted-fg)]"
+      className="mb-1 block text-[11px] font-medium text-(--muted-fg)"
     >
       {children}
       {required ? <span className="text-red-400"> *</span> : null}
@@ -212,7 +212,7 @@ export function CreateLeadDialog() {
           ) : null}
 
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-(--muted-fg)">
               Empresa
             </h3>
             <div>
@@ -251,10 +251,10 @@ export function CreateLeadDialog() {
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-(--muted-fg)">
               Contacto
             </h3>
-            <p className="text-[11px] text-[var(--muted-fg)]">
+            <p className="text-[11px] text-(--muted-fg)">
               Obligatorio: correo general, teléfono o web.
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -317,7 +317,7 @@ export function CreateLeadDialog() {
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-(--muted-fg)">
               Ubicación
             </h3>
             <div className="grid grid-cols-2 gap-2">
@@ -325,7 +325,7 @@ export function CreateLeadDialog() {
                 <Label htmlFor="province">Provincia</Label>
                 <select
                   id="province"
-                  className="flex h-8 w-full rounded-md border border-[var(--border)] bg-[var(--bg)] px-2.5 text-sm"
+                  className="flex h-8 w-full rounded-md border border-(--border) bg-(--bg) px-2.5 text-sm"
                   value={form.province ?? ""}
                   onChange={(e) =>
                     setField("province", e.target.value || null)
@@ -385,7 +385,7 @@ export function CreateLeadDialog() {
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-(--muted-fg)">
               CRM
             </h3>
             <div>
@@ -401,8 +401,8 @@ export function CreateLeadDialog() {
                       className={cn(
                         "rounded-full border px-2 py-0.5 text-[11px]",
                         active
-                          ? "border-[var(--accent)] bg-[var(--accent)]/15"
-                          : "border-[var(--border)] text-[var(--muted-fg)]",
+                          ? "border-(--accent) bg-(--accent)/15"
+                          : "border-(--border) text-(--muted-fg)",
                       )}
                     >
                       {s}
@@ -417,7 +417,7 @@ export function CreateLeadDialog() {
                 <Label htmlFor="confidence">Confianza</Label>
                 <select
                   id="confidence"
-                  className="flex h-8 w-full rounded-md border border-[var(--border)] bg-[var(--bg)] px-2.5 text-sm"
+                  className="flex h-8 w-full rounded-md border border-(--border) bg-(--bg) px-2.5 text-sm"
                   value={form.confidence ?? ""}
                   onChange={(e) =>
                     setField("confidence", e.target.value || null)
@@ -452,7 +452,7 @@ export function CreateLeadDialog() {
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-(--muted-fg)">
               Notas
             </h3>
             <Textarea
@@ -463,7 +463,7 @@ export function CreateLeadDialog() {
             />
           </section>
 
-          <div className="flex justify-end gap-2 border-t border-[var(--border)] pt-3">
+          <div className="flex justify-end gap-2 border-t border-(--border) pt-3">
             <Button
               type="button"
               variant="ghost"

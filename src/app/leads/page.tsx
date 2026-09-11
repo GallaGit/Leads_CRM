@@ -5,7 +5,7 @@ export default function LeadsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-1 items-center justify-center text-[var(--muted-fg)]">
+        <div className="flex flex-1 items-center justify-center text-(--muted-fg)">
           Cargando leads…
         </div>
       }

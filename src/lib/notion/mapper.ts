@@ -103,6 +103,8 @@ export function mapNotionPageToLead(page: unknown): Lead | null {
   const city = richText(p["Ciudad"]);
   const rawEmailBody = richText(p["Email generado"]);
 
+  const discoveredAt = dateStart(p["Fecha de descubrimiento"]) ?? full.created_time;
+
   return {
     id: full.id,
     url: full.url,
@@ -122,7 +124,8 @@ export function mapNotionPageToLead(page: unknown): Lead | null {
     services: multiSelect(p["Servicios"]),
     status: normalizeStatus(select(p["Estado"])),
     lastActivity: dateStart(p["Última actualización"]),
-    createdAt: dateStart(p["Fecha de descubrimiento"]) ?? full.created_time,
+    createdAt: discoveredAt,
+    discoveredAt,
     notes: richText(p["Observaciones"]),
     notesOverflow: null,
     emailSubject: richText(p["Asunto email"]),

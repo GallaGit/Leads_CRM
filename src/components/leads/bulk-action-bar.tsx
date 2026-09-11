@@ -62,12 +62,12 @@ export function BulkActionBar() {
 
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-[var(--border)] bg-[var(--muted)] px-4 py-2">
+      <div className="flex items-center gap-2 border-b border-(--border) bg-(--muted) px-4 py-2">
         <span className="text-[12px] font-medium">
           {selectedIds.length} seleccionados
         </span>
         <select
-          className="h-7 rounded border border-[var(--border)] bg-[var(--bg)] px-2 text-[12px]"
+          className="h-7 rounded border border-(--border) bg-(--bg) px-2 text-[12px]"
           defaultValue=""
           onChange={(e) => {
             if (!e.target.value) return;

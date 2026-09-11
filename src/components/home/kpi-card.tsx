@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { motionPresets } from "@/lib/motion/presets";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useCountUp } from "@/hooks/useCountUp";
 
@@ -36,16 +35,6 @@ export function KPICard({
     info: "text-info bg-info/10 dark:bg-info/20",
     advertencia: "text-advertencia bg-advertencia/10 dark:bg-advertencia/20",
   };
-
-  const sparklineColors = {
-    rojo: "stroke-rojo",
-    grafito: "stroke-gris-400 dark:stroke-gris-500",
-    exito: "stroke-exito",
-    info: "stroke-info",
-    advertencia: "stroke-advertencia",
-  };
-
-  const Component = href ? "a" : "div";
 
   return (
     <motion.div

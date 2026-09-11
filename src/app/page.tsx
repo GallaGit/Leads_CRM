@@ -100,15 +100,15 @@ export default function HomePage() {
     <>
       <Topbar title="Dashboard" />
       <div className="min-h-0 flex-1 overflow-auto p-6">
-        <p className="mb-4 text-sm text-[var(--muted-fg)]">
+        <p className="mb-4 text-sm text-(--muted-fg)">
           Cualificación de leads · Notion como fuente de verdad. Las tarjetas
           con cola abren Daily Work filtrado.
         </p>
         {syncState === "syncing" && leads.length === 0 ? (
-          <p className="mb-4 text-sm text-[var(--muted-fg)]">Sincronizando…</p>
+          <p className="mb-4 text-sm text-(--muted-fg)">Sincronizando…</p>
         ) : null}
         {!leads.length && syncState === "idle" ? (
-          <p className="mb-4 text-sm text-[var(--muted-fg)]">
+          <p className="mb-4 text-sm text-(--muted-fg)">
             Sin leads aún. Pulsa Sincronizar o crea uno en Leads.
           </p>
         ) : null}
@@ -117,7 +117,7 @@ export default function HomePage() {
             const clickable = Boolean(k.queue || k.href);
             const content = (
               <>
-                <div className="text-[11px] text-[var(--muted-fg)]">{k.label}</div>
+                <div className="text-[11px] text-(--muted-fg)">{k.label}</div>
                 <div className="mt-1 text-xl font-semibold tracking-tight">
                   {k.value}
                 </div>
@@ -129,7 +129,7 @@ export default function HomePage() {
                   key={k.label}
                   type="button"
                   onClick={() => openQueue(k.queue!)}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--panel)] p-3 text-left transition-colors hover:border-[var(--accent)]"
+                  className="rounded-lg border border-(--border) bg-(--panel) p-3 text-left transition-colors hover:border-(--accent)"
                 >
                   {content}
                 </button>
@@ -141,7 +141,7 @@ export default function HomePage() {
                   key={k.label}
                   type="button"
                   onClick={openValidated}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--panel)] p-3 text-left transition-colors hover:border-[var(--accent)]"
+                  className="rounded-lg border border-(--border) bg-(--panel) p-3 text-left transition-colors hover:border-(--accent)"
                 >
                   {content}
                 </button>
@@ -152,7 +152,7 @@ export default function HomePage() {
                 <Link
                   key={k.label}
                   href={k.href}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--panel)] p-3 transition-colors hover:border-[var(--accent)]"
+                  className="rounded-lg border border-(--border) bg-(--panel) p-3 transition-colors hover:border-(--accent)"
                 >
                   {content}
                 </Link>
@@ -161,7 +161,7 @@ export default function HomePage() {
             return (
               <div
                 key={k.label}
-                className={`rounded-lg border border-[var(--border)] bg-[var(--panel)] p-3 ${
+                className={`rounded-lg border border-(--border) bg-(--panel) p-3 ${
                   clickable ? "" : "opacity-95"
                 }`}
               >

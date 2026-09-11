@@ -22,18 +22,13 @@ export function useCountUp(
   const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      setCount(end);
-      return;
-    }
-
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
     if (prefersReduced) {
-      setCount(end);
-      return;
+      const id = requestAnimationFrame(() => setCount(end));
+      return () => cancelAnimationFrame(id);
     }
 
     let started = false;

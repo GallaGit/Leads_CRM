@@ -41,12 +41,12 @@ export function EmailWorkbenchPage() {
     <>
       <Topbar title="Email" />
       <div className="flex min-h-0 flex-1">
-        <aside className="w-72 shrink-0 overflow-y-auto border-r border-[var(--border)] bg-[var(--panel)]">
-          <div className="border-b border-[var(--border)] px-3 py-2 text-[11px] text-[var(--muted-fg)]">
+        <aside className="w-72 shrink-0 overflow-y-auto border-r border-(--border) bg-(--panel)">
+          <div className="border-b border-(--border) px-3 py-2 text-[11px] text-(--muted-fg)">
             Borradores · {candidates.length}
           </div>
           {candidates.length === 0 ? (
-            <p className="p-3 text-[12px] text-[var(--muted-fg)]">
+            <p className="p-3 text-[12px] text-(--muted-fg)">
               No hay emails generados. Genera borradores en n8n o aplica la
               plantilla desde un lead.
             </p>
@@ -57,14 +57,14 @@ export function EmailWorkbenchPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedId(lead.id)}
-                    className={`w-full border-b border-[var(--border)] px-3 py-2 text-left text-[12px] hover:bg-[var(--muted)] ${
-                      selected?.id === lead.id ? "bg-[var(--muted)]" : ""
+                    className={`w-full border-b border-(--border) px-3 py-2 text-left text-[12px] hover:bg-(--muted) ${
+                      selected?.id === lead.id ? "bg-(--muted)" : ""
                     }`}
                   >
                     <div className="line-clamp-2 font-medium">
                       {lead.companyName}
                     </div>
-                    <div className="mt-0.5 truncate text-[10px] text-[var(--muted-fg)]">
+                    <div className="mt-0.5 truncate text-[10px] text-(--muted-fg)">
                       {lead.emailSubject || lead.status}
                     </div>
                   </button>
@@ -75,7 +75,7 @@ export function EmailWorkbenchPage() {
         </aside>
         <div className="min-w-0 flex-1 overflow-y-auto p-4">
           {!selected ? (
-            <p className="text-sm text-[var(--muted-fg)]">
+            <p className="text-sm text-(--muted-fg)">
               Selecciona un lead con borrador a la izquierda.
             </p>
           ) : (
@@ -141,7 +141,7 @@ function EmailDraftPanel({
   return (
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-1 text-sm font-semibold">{selected.companyName}</h2>
-      <p className="mb-4 text-[12px] text-[var(--muted-fg)]">
+      <p className="mb-4 text-[12px] text-(--muted-fg)">
         {selected.email ?? "Sin correo"} · {selected.status}
       </p>
       <EmailEditor
