@@ -149,7 +149,7 @@ function AddCard({ onAdd }: AddCardProps) {
         autoFocus
         placeholder="Título de la tarjeta..."
         rows={2}
-        className="w-full min-h-[60px] resize-none rounded border border-gris-300 dark:border-gris-600 bg-blanco dark:bg-gris-800 px-3 py-2 text-sm text-grafito dark:text-gris-100 placeholder:text-gris-400 focus:outline-none focus:ring-2 focus:ring-rojo focus:border-transparent"
+        className="w-full min-h-15 resize-none rounded border border-gris-300 dark:border-gris-600 bg-blanco dark:bg-gris-800 px-3 py-2 text-sm text-grafito dark:text-gris-100 placeholder:text-gris-400 focus:outline-none focus:ring-2 focus:ring-rojo focus:border-transparent"
       />
       <div className="flex justify-end gap-2">
         <button

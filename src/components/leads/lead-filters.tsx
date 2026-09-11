@@ -28,8 +28,8 @@ function Chip({
       onClick={onClick}
       className={`rounded-full border px-2 py-0.5 text-[11px] transition-colors ${
         active
-          ? "border-[var(--accent)] bg-[var(--accent)]/15 text-[var(--fg)]"
-          : "border-[var(--border)] text-[var(--muted-fg)] hover:bg-[var(--muted)]"
+          ? "border-(--accent) bg-(--accent)/15 text-(--fg)"
+          : "border-(--border) text-(--muted-fg) hover:bg-(--muted)"
       }`}
     >
       {children}
@@ -137,7 +137,7 @@ export function LeadFiltersBar() {
   }
 
   return (
-    <div className="space-y-2 border-b border-[var(--border)] bg-[var(--panel)] px-4 py-3">
+    <div className="space-y-2 border-b border-(--border) bg-(--panel) px-4 py-3">
       <div className="flex flex-wrap items-center gap-2">
         <Input
           placeholder="Buscar empresa, dominio, email, ciudad…"
@@ -146,11 +146,11 @@ export function LeadFiltersBar() {
           onChange={(e) => setFilters({ search: e.target.value || undefined })}
         />
         {activeQueue && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-[var(--accent)] bg-[var(--accent)]/15 px-2 py-0.5 text-[11px]">
+          <span className="inline-flex items-center gap-1 rounded-full border border-(--accent) bg-(--accent)/15 px-2 py-0.5 text-[11px]">
             Cola: {getWorkQueueTitle(activeQueue)}
             <button
               type="button"
-              className="rounded p-0.5 hover:bg-[var(--muted)]"
+              className="rounded p-0.5 hover:bg-(--muted)"
               onClick={clearQueue}
               aria-label="Quitar cola"
             >
@@ -192,7 +192,7 @@ export function LeadFiltersBar() {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        <span className="mr-1 self-center text-[11px] text-[var(--muted-fg)]">
+        <span className="mr-1 self-center text-[11px] text-(--muted-fg)">
           Estado
         </span>
         {LEAD_STATUSES.map((s) => (
@@ -209,7 +209,7 @@ export function LeadFiltersBar() {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        <span className="mr-1 self-center text-[11px] text-[var(--muted-fg)]">
+        <span className="mr-1 self-center text-[11px] text-(--muted-fg)">
           Provincia
         </span>
         {PROVINCES.map((p) => (
@@ -226,7 +226,7 @@ export function LeadFiltersBar() {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        <span className="mr-1 self-center text-[11px] text-[var(--muted-fg)]">
+        <span className="mr-1 self-center text-[11px] text-(--muted-fg)">
           Ciudad
         </span>
         {cities.slice(0, 16).map((c) => (
@@ -241,7 +241,7 @@ export function LeadFiltersBar() {
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="mr-1 text-[11px] text-[var(--muted-fg)]">Empleados</span>
+        <span className="mr-1 text-[11px] text-(--muted-fg)">Empleados</span>
         <Input
           type="number"
           placeholder="Min"
@@ -253,7 +253,7 @@ export function LeadFiltersBar() {
             })
           }
         />
-        <span className="text-[var(--muted-fg)]">–</span>
+        <span className="text-(--muted-fg)">–</span>
         <Input
           type="number"
           placeholder="Max"
@@ -273,7 +273,7 @@ export function LeadFiltersBar() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[11px] text-[var(--muted-fg)]">Creación</span>
+        <span className="text-[11px] text-(--muted-fg)">Creación</span>
         <Input
           type="date"
           className="h-7 w-auto"
@@ -288,7 +288,7 @@ export function LeadFiltersBar() {
           value={filters.createdTo ?? ""}
           onChange={(e) => setFilters({ createdTo: e.target.value || null })}
         />
-        <span className="text-[11px] text-[var(--muted-fg)]">Actividad</span>
+        <span className="text-[11px] text-(--muted-fg)">Actividad</span>
         <Input
           type="date"
           className="h-7 w-auto"

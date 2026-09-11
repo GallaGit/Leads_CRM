@@ -25,16 +25,16 @@ export function SecretField({
     <div>
       <label
         htmlFor={id}
-        className="mb-1 block text-[11px] font-medium text-[var(--muted-fg)]"
+        className="mb-1 block text-[11px] font-medium text-(--muted-fg)"
       >
         {label}
       </label>
       {field.configured ? (
-        <p className="mb-1 text-[11px] text-[var(--muted-fg)]">
+        <p className="mb-1 text-[11px] text-(--muted-fg)">
           Configurado {field.preview} · origen: {sourceLabel(field.source)}
         </p>
       ) : (
-        <p className="mb-1 text-[11px] text-[var(--muted-fg)]">Sin configurar</p>
+        <p className="mb-1 text-[11px] text-(--muted-fg)">Sin configurar</p>
       )}
       <Input
         id={id}
@@ -44,7 +44,7 @@ export function SecretField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
       />
-      <p className="mt-1 text-[11px] text-[var(--muted-fg)]">
+      <p className="mt-1 text-[11px] text-(--muted-fg)">
         {hint ?? "Vacío = no cambiar el secreto actual."}
       </p>
     </div>
@@ -70,7 +70,7 @@ export function TextField({
     <div>
       <label
         htmlFor={id}
-        className="mb-1 block text-[11px] font-medium text-[var(--muted-fg)]"
+        className="mb-1 block text-[11px] font-medium text-(--muted-fg)"
       >
         {label}
       </label>
@@ -82,7 +82,7 @@ export function TextField({
         autoComplete="off"
       />
       {hint ? (
-        <p className="mt-1 text-[11px] text-[var(--muted-fg)]">{hint}</p>
+        <p className="mt-1 text-[11px] text-(--muted-fg)">{hint}</p>
       ) : null}
     </div>
   );

@@ -26,13 +26,13 @@ export function ConnectionBadge({
           status === "ok" && "bg-emerald-500/15 text-emerald-400",
           status === "error" && "bg-red-500/15 text-red-400",
           status === "syncing" && "bg-amber-500/15 text-amber-400",
-          status === "never" && "bg-[var(--muted)] text-[var(--muted-fg)]",
+          status === "never" && "bg-(--muted) text-(--muted-fg)",
         )}
       >
         {LABELS[status]}
       </span>
       {connection.lastSyncedAt ? (
-        <span className="text-[var(--muted-fg)]">
+        <span className="text-(--muted-fg)">
           Última sync:{" "}
           {new Date(connection.lastSyncedAt).toLocaleString("es-ES", {
             dateStyle: "short",

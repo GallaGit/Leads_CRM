@@ -8,7 +8,7 @@ const SECTION_ORDER = [
 
 export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
   return (
-    <div className="divide-y divide-[var(--border)]">
+    <div className="divide-y divide-(--border)">
       {SECTION_ORDER.map((key) => {
         const items = analysis[key].slice(0, 5);
         return (
@@ -16,16 +16,16 @@ export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
             key={key}
             className={
               key === "inference"
-                ? "border-l-2 border-l-[var(--accent)] py-2 pl-2.5"
+                ? "border-l-2 border-l-(--accent) py-2 pl-2.5"
                 : "py-2"
             }
           >
             <div className="flex items-center gap-1.5">
-              <h4 className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+              <h4 className="text-[11px] font-semibold uppercase tracking-wide text-(--muted-fg)">
                 {PAIN_SECTION_LABELS[key]}
               </h4>
               {key === "speculation" ? (
-                <span className="rounded border border-[var(--border)] px-1 py-px text-[10px] leading-none text-[var(--muted-fg)]">
+                <span className="rounded border border-(--border) px-1 py-px text-[10px] leading-none text-(--muted-fg)">
                   hipótesis
                 </span>
               ) : null}
@@ -34,8 +34,8 @@ export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
               <ul
                 className={
                   key === "speculation"
-                    ? "mt-1 space-y-1 text-[12.5px] text-[var(--muted-fg)]"
-                    : "mt-1 space-y-1 text-[12.5px] text-[var(--fg)]"
+                    ? "mt-1 space-y-1 text-[12.5px] text-(--muted-fg)"
+                    : "mt-1 space-y-1 text-[12.5px] text-(--fg)"
                 }
               >
                 {items.map((item) => (
@@ -45,7 +45,7 @@ export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
                 ))}
               </ul>
             ) : (
-              <p className="mt-1 text-[12.5px] text-[var(--muted-fg)]">—</p>
+              <p className="mt-1 text-[12.5px] text-(--muted-fg)">—</p>
             )}
           </div>
         );
@@ -56,13 +56,13 @@ export function PainAnalysisBlocks({ analysis }: { analysis: PainAnalysis }) {
 
 export function PainAnalysisSkeletons() {
   return (
-    <div className="divide-y divide-[var(--border)]">
+    <div className="divide-y divide-(--border)">
       {SECTION_ORDER.map((key) => (
         <div key={key} className="flex h-12 flex-col justify-center">
-          <h4 className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)] opacity-60">
+          <h4 className="text-[11px] font-semibold uppercase tracking-wide text-(--muted-fg) opacity-60">
             {PAIN_SECTION_LABELS[key]}
           </h4>
-          <div className="mt-1 h-4 animate-pulse rounded bg-[var(--muted)]" />
+          <div className="mt-1 h-4 animate-pulse rounded bg-(--muted)" />
         </div>
       ))}
     </div>

@@ -265,8 +265,8 @@ function LeadDrawerBody({
 
   return (
     <>
-      <aside className="flex h-full w-[420px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--panel)]">
-        <div className="flex h-12 items-center justify-between border-b border-[var(--border)] px-3">
+      <aside className="flex h-full w-[420px] shrink-0 flex-col border-l border-(--border) bg-(--panel)">
+        <div className="flex h-12 items-center justify-between border-b border-(--border) px-3">
           <span className="truncate text-sm font-semibold">
             {lead?.companyName ?? "Lead"}
           </span>
@@ -280,7 +280,7 @@ function LeadDrawerBody({
         </div>
 
         {lead ? (
-          <div className="flex shrink-0 flex-wrap gap-1 border-b border-[var(--border)] px-3 py-2">
+          <div className="flex shrink-0 flex-wrap gap-1 border-b border-(--border) px-3 py-2">
             {lead.website && (
               <Action href={lead.website} icon={ExternalLink} tip="Web" />
             )}
@@ -355,7 +355,7 @@ function LeadDrawerBody({
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="h-10 animate-pulse rounded bg-[var(--muted)]"
+                className="h-10 animate-pulse rounded bg-(--muted)"
               />
             ))}
           </div>
@@ -387,11 +387,11 @@ function LeadDrawerBody({
             </Section>
 
             <Section title="CRM">
-              <label className="block text-[11px] text-[var(--muted-fg)]">
+              <label className="block text-[11px] text-(--muted-fg)">
                 Estado
               </label>
               <select
-                className={`mt-1 w-full rounded-md border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-sm ${statusColor(lead.status)}`}
+                className={`mt-1 w-full rounded-md border border-(--border) bg-(--bg) px-2 py-1.5 text-sm ${statusColor(lead.status)}`}
                 value={lead.status}
                 disabled={saving}
                 onChange={(e) =>
@@ -481,7 +481,7 @@ function LeadDrawerBody({
 
             <Section title="Actividad">
               {activity.length === 0 ? (
-                <p className="text-[12px] text-[var(--muted-fg)]">
+                <p className="text-[12px] text-(--muted-fg)">
                   Sin eventos todavía.
                 </p>
               ) : (
@@ -489,9 +489,9 @@ function LeadDrawerBody({
                   {activity.map((a, i) => (
                     <li
                       key={`${a.at}-${i}`}
-                      className="border-l-2 border-[var(--border)] pl-2 text-[12px]"
+                      className="border-l-2 border-(--border) pl-2 text-[12px]"
                     >
-                      <div className="text-[10px] text-[var(--muted-fg)]">
+                      <div className="text-[10px] text-(--muted-fg)">
                         {a.at ? new Date(a.at).toLocaleString("es-ES") : ""} ·{" "}
                         {a.type}
                       </div>
@@ -503,7 +503,7 @@ function LeadDrawerBody({
             </Section>
           </div>
         ) : (
-          <p className="p-4 text-[var(--muted-fg)]">Lead no encontrado</p>
+          <p className="p-4 text-(--muted-fg)">Lead no encontrado</p>
         )}
       </aside>
 
@@ -537,7 +537,7 @@ function Section({
 }) {
   return (
     <section>
-      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-(--muted-fg)">
         {title}
       </h3>
       <div className="space-y-1.5">{children}</div>
@@ -554,8 +554,8 @@ function Field({
 }) {
   return (
     <div className="grid grid-cols-[100px_1fr] gap-2 text-[12.5px]">
-      <span className="text-[var(--muted-fg)]">{label}</span>
-      <span className="break-words text-[var(--fg)]">{value || "—"}</span>
+      <span className="text-(--muted-fg)">{label}</span>
+      <span className="break-words text-(--fg)">{value || "—"}</span>
     </div>
   );
 }

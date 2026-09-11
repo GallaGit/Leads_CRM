@@ -91,14 +91,14 @@ export function LeadTable() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-wrap gap-2 border-b border-[var(--border)] px-4 py-2">
-        <span className="self-center text-[11px] text-[var(--muted-fg)]">
+      <div className="flex flex-wrap gap-2 border-b border-(--border) px-4 py-2">
+        <span className="self-center text-[11px] text-(--muted-fg)">
           Columnas
         </span>
         {(Object.keys(COL_LABELS) as ColKey[]).map((key) => (
           <label
             key={key}
-            className="flex items-center gap-1 text-[11px] text-[var(--muted-fg)]"
+            className="flex items-center gap-1 text-[11px] text-(--muted-fg)"
           >
             <input
               type="checkbox"
@@ -113,15 +113,15 @@ export function LeadTable() {
             {COL_LABELS[key]}
           </label>
         ))}
-        <span className="ml-auto text-[11px] text-[var(--muted-fg)]">
+        <span className="ml-auto text-[11px] text-(--muted-fg)">
           {data.length} leads
         </span>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-left text-[12.5px]">
-          <thead className="sticky top-0 z-10 bg-[var(--panel)]">
-            <tr className="border-b border-[var(--border)]">
+          <thead className="sticky top-0 z-10 bg-(--panel)">
+            <tr className="border-b border-(--border)">
               <th className="px-3 py-2">
                 <input
                   type="checkbox"
@@ -139,7 +139,7 @@ export function LeadTable() {
               {visibleCols.map((key) => (
                 <th
                   key={key}
-                  className="cursor-pointer px-3 py-2 font-medium text-[var(--muted-fg)]"
+                  className="cursor-pointer px-3 py-2 font-medium text-(--muted-fg)"
                   onClick={() => toggleSort(key)}
                 >
                   {COL_LABELS[key]}
@@ -153,7 +153,7 @@ export function LeadTable() {
               <tr>
                 <td
                   colSpan={visibleCols.length + 1}
-                  className="px-3 py-12 text-center text-[var(--muted-fg)]"
+                  className="px-3 py-12 text-center text-(--muted-fg)"
                 >
                   No hay leads. Pulsa Sincronizar o ajusta los filtros.
                 </td>
@@ -163,8 +163,8 @@ export function LeadTable() {
                 <tr
                   key={lead.id}
                   onClick={() => setSelectedLeadId(lead.id)}
-                  className={`cursor-pointer border-b border-[var(--border)] hover:bg-[var(--muted)] ${
-                    selectedLeadId === lead.id ? "bg-[var(--muted)]" : ""
+                  className={`cursor-pointer border-b border-(--border) hover:bg-(--muted) ${
+                    selectedLeadId === lead.id ? "bg-(--muted)" : ""
                   }`}
                 >
                   <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
@@ -228,14 +228,14 @@ function Cell({
             className={`h-3.5 w-3.5 ${
               lead.favorite
                 ? "fill-amber-400 text-amber-400"
-                : "text-[var(--muted-fg)]"
+                : "text-(--muted-fg)"
             }`}
           />
         </button>
       );
     case "companyName":
       return (
-        <span className="font-medium text-[var(--fg)]">{lead.companyName}</span>
+        <span className="font-medium text-(--fg)">{lead.companyName}</span>
       );
     case "status":
       return (
@@ -251,7 +251,7 @@ function Cell({
             <option
               key={s}
               value={s}
-              className="bg-[var(--panel)] text-[var(--fg)]"
+              className="bg-(--panel) text-(--fg)"
             >
               {s}
             </option>
@@ -266,7 +266,7 @@ function Cell({
       return <>{lead.employees ?? "—"}</>;
     case "email":
       return (
-        <span className="truncate text-[var(--muted-fg)]">
+        <span className="truncate text-(--muted-fg)">
           {lead.email ?? "—"}
         </span>
       );

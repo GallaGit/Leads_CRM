@@ -23,15 +23,15 @@ export function AiAnalysisPanel({
 }) {
   return (
     <section ref={sectionRef}>
-      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]">
+      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-(--muted-fg)">
         Dolores
       </h3>
       <div className="space-y-1.5">
         {analyzing ? <PainAnalysisSkeletons /> : null}
 
         {!analyzing && error ? (
-          <div className="rounded-md border border-[var(--border)] px-2.5 py-2">
-            <p className="text-[12px] text-[var(--fg)]">
+          <div className="rounded-md border border-(--border) px-2.5 py-2">
+            <p className="text-[12px] text-(--fg)">
               No se pudo detectar dolores. {error}
             </p>
             <Button
@@ -47,17 +47,17 @@ export function AiAnalysisPanel({
 
         {!analyzing && !error && empty ? (
           <div>
-            <p className="text-[12px] text-[var(--muted-fg)]">
+            <p className="text-[12px] text-(--muted-fg)">
               No hay señales suficientes en este lead.
             </p>
-            <p className="mt-1 text-[11px] text-[var(--muted-fg)]">
+            <p className="mt-1 text-[11px] text-(--muted-fg)">
               Añade web, servicios o notas y vuelve a intentar.
             </p>
           </div>
         ) : null}
 
         {!analyzing && !error && !empty && !analysis ? (
-          <p className="text-[12px] text-[var(--muted-fg)]">
+          <p className="text-[12px] text-(--muted-fg)">
             Aún no hay análisis. Pulsa Detectar dolores.
           </p>
         ) : null}
