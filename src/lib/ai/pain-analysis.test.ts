@@ -528,6 +528,7 @@ describe('pain-analysis - Constants', () => {
 function createMockLead(overrides: Partial<Lead> = {}): Lead {
   return {
     id: `lead-${Math.random().toString(36).slice(2)}`,
+    url: '',
     companyName: 'Test Company',
     website: null,
     phone: null,
@@ -541,6 +542,7 @@ function createMockLead(overrides: Partial<Lead> = {}): Lead {
     services: [],
     status: 'Nuevo' as const,
     lastActivity: new Date().toISOString(),
+    createdAt: null,
     discoveredAt: new Date().toISOString(),
     notes: '',
     notesOverflow: null,
@@ -557,6 +559,10 @@ function createMockLead(overrides: Partial<Lead> = {}): Lead {
     archived: false,
     aiAnalysis: null,
     nextFollowUp: null,
+    emailSubject: null,
+    emailBody: null,
+    lastContact: null,
+    lastEditedTime: null,
     ...overrides,
-  }
+  } as Lead
 }

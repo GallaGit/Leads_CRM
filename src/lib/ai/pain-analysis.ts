@@ -44,7 +44,10 @@ export function isPainAnalysisEmpty(analysis: PainAnalysis): boolean {
 }
 
 export function normalizePainAnalysis(
-  value: Partial<PainAnalysis> | null | undefined,
+  value:
+    | Partial<Record<PainSectionKey, unknown>>
+    | null
+    | undefined,
 ): PainAnalysis {
   return {
     evidence: cleanItems(value?.evidence),

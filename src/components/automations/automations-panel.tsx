@@ -91,7 +91,7 @@ export function AutomationsPanel() {
   }
 
   if (query.isPending) {
-    return <p className="text-sm text-(--muted-fg)">Cargando…</p>;
+    return <p className="text-sm text-muted-fg">Cargando…</p>;
   }
   if (query.isError) {
     return (
@@ -107,7 +107,7 @@ export function AutomationsPanel() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-(--muted-fg)">
+      <p className="text-sm text-muted-fg">
         La captación se lanza en n8n (Manual o semanal), no desde esta pantalla.
         Leads_CRM no edita el workflow. En v1 no actives los toggles ni pegues
         URLs: la capa de webhooks está lista, pero el workflow no tiene esos
@@ -119,19 +119,19 @@ export function AutomationsPanel() {
         return (
           <section
             key={item.action}
-            className="space-y-3 rounded-lg border border-(--border) bg-(--panel) p-4"
+            className="space-y-3 rounded-lg border border-border bg-panel p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-[13px] font-medium tracking-tight">
                   {item.name}
                 </h2>
-                <p className="mt-0.5 text-[12px] text-(--muted-fg)">
+                <p className="mt-0.5 text-[12px] text-muted-fg">
                   {item.description}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-(--muted-fg)">
+                <span className="text-[11px] text-muted-fg">
                   {item.enabled ? "Activa" : "Inactiva"}
                 </span>
                 <Switch
@@ -148,12 +148,12 @@ export function AutomationsPanel() {
             <div className="flex flex-wrap items-center gap-2 text-[11px]">
               <span
                 className={
-                  configured ? "text-emerald-400" : "text-(--muted-fg)"
+                  configured ? "text-emerald-400" : "text-muted-fg"
                 }
               >
                 {configured ? "Webhook configurado" : "Sin webhook"}
               </span>
-              <span className="text-(--muted-fg)">
+              <span className="text-muted-fg">
                 {inactive ? "No se disparará hasta activarla" : "Lista"}
               </span>
             </div>
