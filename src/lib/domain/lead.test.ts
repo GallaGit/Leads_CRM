@@ -52,6 +52,7 @@ describe('domain/lead - Lead type structure', () => {
   it('Lead type has all required fields', () => {
     const lead: Lead = {
       id: 'test-id',
+      url: '',
       companyName: 'Test Company',
       website: 'https://test.com',
       phone: '+34 600 111 222',
@@ -65,6 +66,7 @@ describe('domain/lead - Lead type structure', () => {
       services: ['Asesoría'],
       status: 'Nuevo',
       lastActivity: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       discoveredAt: new Date().toISOString(),
       notes: 'Test notes',
       notesOverflow: null,
@@ -82,6 +84,8 @@ describe('domain/lead - Lead type structure', () => {
       favorite: false,
       archived: false,
       aiAnalysis: null,
+      lastContact: null,
+      lastEditedTime: null,
       nextFollowUp: null,
     }
 
@@ -96,6 +100,7 @@ describe('domain/lead - Lead type structure', () => {
   it('Lead type allows optional fields to be null/undefined', () => {
     const minimalLead: Lead = {
       id: 'minimal',
+      url: '',
       companyName: 'Minimal',
       website: null,
       phone: null,
@@ -109,6 +114,7 @@ describe('domain/lead - Lead type structure', () => {
       services: [],
       status: 'Nuevo',
       lastActivity: new Date().toISOString(),
+      createdAt: null,
       discoveredAt: new Date().toISOString(),
       notes: '',
       notesOverflow: null,
@@ -126,6 +132,8 @@ describe('domain/lead - Lead type structure', () => {
       favorite: false,
       archived: false,
       aiAnalysis: null,
+      lastContact: null,
+      lastEditedTime: null,
       nextFollowUp: null,
     }
 
