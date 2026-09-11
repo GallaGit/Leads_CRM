@@ -11,14 +11,14 @@ test.describe("Leads_CRM smoke", () => {
 
   test("leads route renders chrome", async ({ page }) => {
     await page.goto("/leads");
-    await expect(page.getByRole("link", { name: "Leads" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Leads" })).toBeVisible({
       timeout: 15000,
     });
   });
 
   test("kanban route renders", async ({ page }) => {
     await page.goto("/kanban");
-    await expect(page.getByRole("link", { name: "Kanban" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Kanban" })).toBeVisible({
       timeout: 15000,
     });
   });
