@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   X,
   ExternalLink,
@@ -120,6 +120,7 @@ function LeadDrawerBody({
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [analyzeEmpty, setAnalyzeEmpty] = useState(false);
   const [apiAnalysis, setApiAnalysis] = useState<unknown>(null);
+  const doloresRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -177,6 +178,9 @@ function LeadDrawerBody({
     setAnalyzing(true);
     setAnalyzeError(null);
     setAnalyzeEmpty(false);
+    requestAnimationFrame(() => {
+      doloresRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     try {
       const res = await fetch(`/api/leads/${previous.id}/analyze`, {
         method: "POST",
@@ -319,28 +323,30 @@ function LeadDrawerBody({
                 className={`h-3.5 w-3.5 ${lead.favorite ? "fill-amber-400 text-amber-400" : ""}`}
               />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
-              disabled={analyzing || loading}
-              onClick={() => void detectPains()}
-            >
-              {analyzing ? (
-                <Loader2 className="h-[18px] w-[18px] animate-spin" />
-              ) : (
-                <ScanSearch className="h-[18px] w-[18px]" />
-              )}
-              {analyzing ? "Detectando…" : "Detectar dolores"}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              title="Archivar"
-              onClick={() => setConfirmArchive(true)}
-            >
-              <Trash2 className="h-3.5 w-3.5 text-red-400" />
-            </Button>
+            <span className="flex gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                title="Analiza evidencia / inferencia / especulación y guarda en Análisis IA"
+                disabled={analyzing || loading}
+                onClick={() => void detectPains()}
+              >
+                {analyzing ? (
+                  <Loader2 className="h-[18px] w-[18px] animate-spin" />
+                ) : (
+                  <ScanSearch className="h-[18px] w-[18px]" />
+                )}
+                {analyzing ? "Detectando…" : "Detectar dolores"}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                title="Archivar"
+                onClick={() => setConfirmArchive(true)}
+              >
+                <Trash2 className="h-3.5 w-3.5 text-red-400" />
+              </Button>
+            </span>
           </div>
         ) : null}
 
@@ -416,6 +422,7 @@ function LeadDrawerBody({
             </Section>
 
             <AiAnalysisPanel
+              sectionRef={doloresRef}
               analyzing={analyzing}
               error={analyzeError}
               empty={analyzeEmpty}

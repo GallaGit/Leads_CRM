@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Fecha de revisión: 2026-09-10 (Fase 7: Detectar dolores IA + persistencia `Análisis IA`; alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07: SettingsService + N8nClient + UI Integraciones/Automations. El repositorio está en GitHub (`GallaGit/Leads_CRM`).
+Fecha de revisión: 2026-09-10 (Fase 7: Detectar dolores IA + persistencia `Análisis IA`; alineación n8n: estado `Nuevo`, email plano, dedupe email/archivados; filtro 3–10 operativo; Daily Work incluye borrador en `Nuevo`). Revisión previa 2026-09-07: SettingsService + N8nClient + UI Integraciones/Automations. El repositorio está en GitHub (`GallaGit/Leads_CRM`); el merge de duplicados ya está en código (ver Disponible).
 
 Este documento describe el comportamiento del código actual. No sustituye a [`DECISIONES.md`](./DECISIONES.md) ni al [`ROADMAP.md`](./ROADMAP.md).
 
@@ -93,13 +93,14 @@ Sesión de referencia de la pasada Development: [`SESION-2026-09-04-dev-pass.md`
 
 ### Detectar dolores (Fase 7)
 
-- botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar);
+- botón **Detectar dolores** en la barra de acciones del drawer (después de Favorito, antes de Archivar); CTA fija en el header (sin scroll); al analizar: spinner + «Detectando…»;
+- spec UX: `docs/ux/SPEC-detectar-dolores-drawer.md`;
 - sección **Dolores** (`ai-analysis-panel.tsx`) debajo de CRM;
 - `POST /api/leads/:id/analyze` (drawer Front) y `POST /api/leads/pain-analysis` (contrato Grok: `{ id?, lead?, persist? }`) llaman a Groq (`analyzeBusinessPains` → `groq-client`, secretos solo servidor) y escriben Notion `Análisis IA` (rich_text) si persist;
 - contrato: `docs/CONTRACT-pain-analysis.md` — Evidencia / Inferencia / Especulación; Groq → 502 `{ error: { code: "ai_error" } }` sin corromper el lead;
 - salida estructurada **Evidencia / Inferencia / Especulación** (`src/lib/ai/pain-analysis.ts`); la UI muestra tres bloques, no un `<pre>` crudo;
 - re-ejecutar está permitido y sobrescribe el análisis; sin confirmación en v1;
-- un fallo de Groq no modifica el lead; actividad (`ai_analyzed`) y comentario Notion en best-effort como el resto de acciones;
+- un fallo de Groq no modifica el lead; actividad (`ai_analyzed`, no `ai_analysis`) y comentario Notion en best-effort como el resto de acciones;
 - si *Lead analizado* está activo, `dispatchLeadAnalyzed` → `notifyLeadAnalyzed` en segundo plano.
 
 ## Parcial

@@ -9,7 +9,12 @@ import {
   mapNotionPageToLead,
   mapResultsToLeads,
 } from "@/lib/notion/mapper";
-import type { Lead, LeadCreateInput, LeadPatch } from "@/lib/domain/lead";
+import {
+  ACTIVITY_TYPE_AI_ANALYZED,
+  type Lead,
+  type LeadCreateInput,
+  type LeadPatch,
+} from "@/lib/domain/lead";
 import type { LeadRepository } from "@/lib/repository/lead-repository";
 import { splitNotes } from "@/lib/utils/email-plain";
 
@@ -163,10 +168,10 @@ export class NotionLeadRepository implements LeadRepository {
         await this.appendActivity(
           id,
           "Análisis IA de dolores actualizado",
-          "ai_analyzed",
+          ACTIVITY_TYPE_AI_ANALYZED,
         );
       } catch (error) {
-        console.error("[activity] ai_analyzed failed", {
+        console.error(`[activity] ${ACTIVITY_TYPE_AI_ANALYZED} failed`, {
           id,
           reason: error instanceof Error ? error.message : "unknown",
         });

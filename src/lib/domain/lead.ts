@@ -136,6 +136,9 @@ export interface ActivityEvent {
   message: string;
 }
 
+/** Timeline type for Detectar dolores. Matches `lead_analyzed` (event), not `ai_analysis`. */
+export const ACTIVITY_TYPE_AI_ANALYZED = "ai_analyzed";
+
 export interface LeadFilters {
   search?: string;
   status?: LeadStatus[];
