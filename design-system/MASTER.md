@@ -1,0 +1,195 @@
+# Design System — Leads CRM
+
+**Generated from:** `saas dashboard minimal tech`
+**Stack:** shadcn
+**Page override:** kanban
+
+---
+
+## 1. Visual Style
+
+**Primary Style:** Minimalism
+**Keywords:** clean, simple, professional, tech
+
+---
+
+## 2. Color Palette
+
+### Brand Colors (Override)
+| Role | Hex | Usage |
+|------|-----|-------|
+| Primary | `#C62828` | CTAs, primary actions, brand identity |
+| Secondary | `#1F2328` | Text, structure, navigation |
+| Accent | `#C62828` | Highlights, focus rings, active states |
+| Background | `#FFFFFF` | Page backgrounds, cards |
+| Text | `#1F2328` | Primary text content |
+| Muted | `#9CA3AF` | Secondary text, placeholders |
+| Border | `#E5E7EB` | Borders, dividers |
+
+### Functional Colors
+| Role | Hex | Usage |
+|------|-----|-------|
+| Success | `#16A34A` | Positive states, confirmations |
+| Warning | `#D97706` | Caution, pending states |
+| Error | `#DC2626` | Errors, destructive actions |
+| Info | `#2563EB` | Information, help |
+
+### Proportions (Brand Guideline)
+- **60-70%** → Background + light neutrals
+- **20-30%** → Secondary (Grafito) for structure
+- **5-10%** → Primary (Rojo) for accent/identity
+
+---
+
+## 3. Typography
+
+| Role | Font | Weights |
+|------|------|---------|
+| Heading | Manrope | 400, 500, 600, 700 |
+| Body | Manrope | 400, 500 |
+| Code | JetBrains Mono | 400, 500 |
+
+### Scale
+```css
+--text-xs: 0.75rem;
+--text-sm: 0.875rem;
+--text-base: 1rem;
+--text-lg: 1.125rem;
+--text-xl: 1.25rem;
+--text-2xl: 1.5rem;
+--text-3xl: 1.875rem;
+--text-4xl: 2.25rem;
+```
+
+---
+
+## 4. Motion
+
+| Property | Value |
+|----------|-------|
+| Base Duration | 150ms |
+| Easing | cubic-bezier(0.4, 0, 0.2, 1) |
+| Reduced Motion | True |
+
+### Presets
+- **Micro** (100ms): Hover, focus
+- **Base** (150ms): Default transitions, drag, expand
+- **Macro** (200-300ms): Page transitions, modals
+- **Count-up** (800-1200ms): KPI counters
+- **Stagger** (50ms delay): List items
+
+---
+
+## 5. Spacing & Layout
+
+**Base Unit:** 4px
+**Scale:** [4, 8, 12, 16, 20, 24, 32, 40, 48, 64]
+
+### Border Radius
+```css
+--radius-sm: 4px;
+--radius-md: 8px;
+--radius-lg: 12px;
+--radius-xl: 16px;
+--radius-full: 9999px;
+```
+
+### Shadows
+```css
+--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+--shadow-glow_primary: 0 0 20px -5px rgb(198 40 40 / 0.4);
+```
+
+---
+
+## 6. Recommended Charts
+
+
+
+---
+
+## 7. Landing Pattern (if applicable)
+
+**Pattern:** Hero + Features
+**Structure:** hero → features → social-proof → cta
+**CTA Placement:** hero + footer
+
+---
+
+## 8. UX Guidelines (Priority Order)
+
+1. **Accessibility** (CRITICAL): Contrast 4.5:1 minimum for text
+2. **Touch** (CRITICAL): Minimum 44x44px touch targets
+3. **Performance** (HIGH): CLS < 0.1, lazy load images
+4. **Animation** (MEDIUM): Respect prefers-reduced-motion
+
+---
+
+## 9. Anti-Patterns (Avoid)
+
+- Mixing flat & skeuomorphic randomly
+- Emoji as icons (use Lucide SVG)
+- Raw hex colors in components (use semantic tokens)
+- Text < 12px for body
+- Gray-on-gray low contrast
+- One duration for every transition
+- Animating width/height (use transform)
+- No reduced-motion support
+- Placeholder-only labels
+- Errors only at top of form
+- Horizontal scroll on mobile
+- Fixed px container widths
+- Disable zoom
+
+---
+
+## 10. Component Inventory
+
+### Current (shadcn/ui)
+- Button, Dialog, Input, Switch
+
+### Target (Elevated + New)
+| Component | Source | Priority | Brand Notes |
+|-----------|--------|----------|-------------|
+| KanbanBoard | Own + framer-motion | P0 | 9 cols, Rojo drag line |
+| DataTableVirtualized | TanStack + virtual | P0 | Row hover lift |
+| CommandPalette | ui-ux-pro-max pattern | P1 | Cmd+K global search |
+| KPICard | 21st.dev Spotlight | P1 | Count-up, sparkline |
+| StatCard | 21st.dev Display Cards | P2 | Micro-chart |
+| Skeleton | 21st.dev Shimmer | P1 | Gallo runner |
+| Toast | Sonner extended | P1 | Progress, variants |
+| ProgressRing | Recharts/custom | P2 | Inbox queues |
+| SplitView | Custom | P2 | Email editor/preview |
+
+---
+
+## 11. 21st.dev Reference Components
+
+- `Spotlight Card` → KPICard, StatCard
+- `Display Cards` → Lead cards, Stat breakdowns
+- `Scroll Choreography` → Home page sections
+- `Container Scroll Animation` → Page transitions
+- `Skeleton shimmer` → Loading states
+- `Command Palette` → Global search
+- `Tilt card` → Subtle hover interactions
+- `Velaris` / `WaterRippleImage` → Hero effects
+
+---
+
+## 12. Accessibility (WCAG 2.2 AA)
+
+- [ ] Contrast 4.5:1 (verify Rojo on Grafito)
+- [ ] Focus visible: `focus-visible:ring-2 focus-visible:ring-rojo`
+- [ ] Keyboard nav: Tab order, Escape, Arrow keys
+- [ ] ARIA labels on icon buttons
+- [ ] Live regions for dynamic content
+- [ ] Reduced motion respected
+- [ ] Skip links
+- [ ] Target size ≥ 44×44px
+
+---
+
+*Generated by ui-ux-pro-max skill*

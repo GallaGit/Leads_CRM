@@ -79,7 +79,7 @@ Objetivo: shell usable, tema Linear-like, env seguro, tipos de dominio, cliente 
 - [x] UI compare / keep / archive / merge seguro (solo campos vacíos)
 - [x] Incluir archivados en dedupe cuando aplique
 - [x] `LeadScorer` modular; escribir `Lead Score`
-- [ ] Timeline desde bloques del cuerpo + comentario Notion por acción — trabajo previo/parcial (ver ESTADO Disponible); no entregado en ciclos 1–5 de la pasada 2026-09-04
+- [x] Timeline desde bloques del cuerpo + comentario Notion por acción — trabajo previo/parcial (ver ESTADO Disponible); no entregado en ciclos 1–5 de la pasada 2026-09-04
 
 ---
 

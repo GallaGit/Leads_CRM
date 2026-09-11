@@ -1,0 +1,36 @@
+# opencode Skill Redirect
+
+This file redirects opencode to the actual skill location in `.agents/skills/`.
+
+**Actual skill path:** `.agents/skills/ui-ux-pro-max/`
+
+## Usage
+
+The skill is loaded from `.agents/skills/ui-ux-pro-max/` which contains:
+- `SKILL.md` — Main skill definition
+- `scripts/search.py` — Design system generator
+- `data/` — Searchable databases (styles, colors, fonts, charts, products, UX guidelines)
+- `references/` — Quick reference and pro rules
+
+## Loading the Skill
+
+In opencode, the skill will be available as `ui-ux-pro-max` and can be invoked via:
+- Automatic activation when UI/UX tasks are detected
+- Explicit skill tool: `skill("ui-ux-pro-max")`
+
+## Key Commands
+
+```bash
+# Generate design system (run from project root)
+python3 .agents/skills/ui-ux-pro-max/scripts/search.py "saas dashboard minimal tech" --design-system --persist -p "Leads CRM"
+
+# Generate with page override
+python3 .agents/skills/ui-ux-pro-max/scripts/search.py "saas dashboard minimal tech" --design-system --persist -p "Leads CRM" --page "kanban"
+```
+
+## Brand Integration
+
+This skill is configured for Leads CRM v1.2 with:
+- Brand colors: Rojo `#C62828`, Grafito `#1F2328`, Manrope/JetBrains Mono
+- Motion: 150ms base, cubic-bezier(0.4, 0, 0.2, 1)
+- References: 21st.dev components, shadcn/ui patterns
