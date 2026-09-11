@@ -1,55 +1,64 @@
 import { describe, it, expect } from 'vitest'
-import { buildWorkQueues, type WorkQueueId } from '@/lib/leads/work-queues'
+import { buildWorkQueues, WORK_QUEUE_IDS, type WorkQueueId } from '@/lib/leads/work-queues'
 import type { Lead, LeadStatus } from '@/lib/domain/lead'
 
-const createMockLead = (overrides: Partial<Lead> = {}): Lead => ({
-  id: `lead-${Math.random().toString(36).slice(2)}`,
-  companyName: 'Test Company',
-  website: 'https://test.com',
-  phone: '+34 600 111 222',
-  address: 'Calle Test 123',
-  postalCode: '46001',
-  city: 'Valencia',
-  cityCanonical: 'Valencia',
-  province: 'Valencia',
-  employees: 10,
-  linkedin: 'https://linkedin.com/company/test',
-  services: ['Asesoría'],
-  status: 'Nuevo' as LeadStatus,
-  lastActivity: new Date().toISOString(),
-  discoveredAt: new Date().toISOString(),
-  notes: '',
-  notesOverflow: null,
-  email: 'test@test.com',
-  emailCommercial: null,
-  emailManager: null,
-  score: 50,
-  manager: 'John Doe',
-  role: 'CEO',
-  confidence: 'Alta',
-  software: 'ERP',
-  source: 'n8n',
-  favorite: false,
-  archived: false,
-  aiAnalysis: null,
-  nextFollowUp: null,
-  ...overrides,
-})
+const createMockLead = (overrides: Partial<Lead> = {}): Lead => {
+  const id = overrides.id ?? `lead-${Math.random().toString(36).slice(2)}`
+  const slug = id.replace(/[^a-z0-9]+/gi, '-').toLowerCase()
+  return {
+    id,
+    url: `https://notion.so/${slug}`,
+    companyName: `Company ${slug}`,
+    website: `https://${slug}.example.com`,
+    phone: `+34 600 ${slug.slice(-3).padStart(3, '0')} 111`,
+    address: `Calle ${slug} 123`,
+    postalCode: '46001',
+    city: 'Valencia',
+    cityCanonical: 'Valencia',
+    province: 'Valencia',
+    employees: 10,
+    linkedin: `https://linkedin.com/company/${slug}`,
+    services: ['Asesoría'],
+    status: 'Nuevo' as LeadStatus,
+    lastActivity: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    discoveredAt: new Date().toISOString(),
+    notes: null,
+    notesOverflow: null,
+    email: `${slug}@example.com`,
+    emailCommercial: null,
+    emailManager: null,
+    emailSubject: null,
+    emailBody: null,
+    score: 50,
+    manager: 'John Doe',
+    role: 'CEO',
+    confidence: 'Alta',
+    software: 'ERP',
+    source: 'n8n',
+    favorite: false,
+    archived: false,
+    aiAnalysis: null,
+    lastContact: null,
+    nextFollowUp: null,
+    lastEditedTime: null,
+    ...overrides,
+  }
+}
 
 describe('work-queues - buildWorkQueues', () => {
-  it('returns 6 queues with correct IDs', () => {
+  it('returns 5 queues with correct IDs', () => {
     const leads = [createMockLead({ id: '1' })]
     const queues = buildWorkQueues(leads)
 
-    expect(queues).toHaveLength(6)
-    const ids = queues.map((q) => q.id)
-    expect(ids).toEqual([
+    expect(queues).toHaveLength(5)
+    expect(queues.map((q) => q.id)).toEqual([...WORK_QUEUE_IDS])
+    expect(queues.map((q) => q.id)).toEqual([
       'pendiente_revisar',
       'faltan_datos',
       'emails_listos',
       'followup_overdue',
       'duplicados',
-      'archivados',
     ])
   })
 
@@ -65,7 +74,7 @@ describe('work-queues - buildWorkQueues', () => {
 
       expect(queue?.count).toBe(1)
       expect(queue?.firstLeadId).toBe('1')
-      expect(queue?.leads.map((l) => l.id)).toEqual(['1'])
+      expect(queue?.leadIds).toEqual(['1'])
     })
 
     it('includes leads with status Pendiente revisar', () => {
@@ -92,6 +101,7 @@ describe('work-queues - buildWorkQueues', () => {
       const queue = queues.find((q) => q.id === 'pendiente_revisar')
 
       expect(queue?.count).toBe(2)
+      expect(queue?.leadIds.sort()).toEqual(['1', '2'])
     })
   })
 
@@ -188,7 +198,7 @@ describe('work-queues - buildWorkQueues', () => {
       const queue = queues.find((q) => q.id === 'followup_overdue')
 
       expect(queue?.count).toBe(2)
-      expect(queue?.leads.map((l) => l.id).sort()).toEqual(['1', '2'])
+      expect(queue?.leadIds.sort()).toEqual(['1', '2'])
     })
 
     it('excludes leads with nextFollowUp today or future', () => {
@@ -230,72 +240,47 @@ describe('work-queues - buildWorkQueues', () => {
   describe('duplicados queue', () => {
     it('includes leads that are in duplicate groups', () => {
       const leads = [
-        createMockLead({ id: '1', email: 'same@test.com' }),
-        createMockLead({ id: '2', email: 'same@test.com' }),
-        createMockLead({ id: '3', email: 'unique@test.com' }),
+        createMockLead({ id: '1', email: 'same@test.com', website: null, phone: null, address: null, postalCode: null }),
+        createMockLead({ id: '2', email: 'same@test.com', website: null, phone: null, address: null, postalCode: null }),
+        createMockLead({ id: '3', email: 'unique@test.com', website: null, phone: null, address: null, postalCode: null }),
       ]
 
       const queues = buildWorkQueues(leads)
       const queue = queues.find((q) => q.id === 'duplicados')
 
       expect(queue?.count).toBe(2)
-      expect(queue?.leads.map((l) => l.id).sort()).toEqual(['1', '2'])
+      expect(queue?.leadIds.sort()).toEqual(['1', '2'])
     })
 
     it('excludes unique leads', () => {
       const leads = [
-        createMockLead({ id: '1', email: 'unique1@test.com' }),
-        createMockLead({ id: '2', email: 'unique2@test.com' }),
+        createMockLead({ id: '1', email: 'unique1@test.com', website: null, phone: null, address: null, postalCode: null }),
+        createMockLead({ id: '2', email: 'unique2@test.com', website: null, phone: null, address: null, postalCode: null }),
       ]
 
       const queues = buildWorkQueues(leads)
       const queue = queues.find((q) => q.id === 'duplicados')
-
-      expect(queue?.count).toBe(0)
-    })
-  })
-
-  describe('archivados queue', () => {
-    it('includes archived leads', () => {
-      const leads = [
-        createMockLead({ id: '1', archived: true }),
-        createMockLead({ id: '2', archived: false }),
-        createMockLead({ id: '3', archived: true }),
-      ]
-
-      const queues = buildWorkQueues(leads)
-      const queue = queues.find((q) => q.id === 'archivados')
-
-      expect(queue?.count).toBe(2)
-      expect(queue?.leads.map((l) => l.id).sort()).toEqual(['1', '3'])
-    })
-
-    it('excludes active leads', () => {
-      const leads = [
-        createMockLead({ id: '1', archived: false }),
-        createMockLead({ id: '2', archived: false }),
-      ]
-
-      const queues = buildWorkQueues(leads)
-      const queue = queues.find((q) => q.id === 'archivados')
 
       expect(queue?.count).toBe(0)
     })
   })
 
   describe('queue structure', () => {
-    it('each queue has id, label, count, firstLeadId, leads', () => {
+    it('each queue has id, title, description, count, leadIds, firstLeadId, previewNames', () => {
       const leads = [createMockLead({ id: '1', status: 'Nuevo' })]
       const queues = buildWorkQueues(leads)
 
       for (const queue of queues) {
         expect(queue).toHaveProperty('id')
-        expect(queue).toHaveProperty('label')
+        expect(queue).toHaveProperty('title')
+        expect(queue).toHaveProperty('description')
         expect(queue).toHaveProperty('count')
+        expect(queue).toHaveProperty('leadIds')
         expect(queue).toHaveProperty('firstLeadId')
-        expect(queue).toHaveProperty('leads')
+        expect(queue).toHaveProperty('previewNames')
         expect(typeof queue.count).toBe('number')
-        expect(Array.isArray(queue.leads)).toBe(true)
+        expect(Array.isArray(queue.leadIds)).toBe(true)
+        expect(Array.isArray(queue.previewNames)).toBe(true)
       }
     })
 
@@ -318,22 +303,33 @@ describe('work-queues - buildWorkQueues', () => {
 
       expect(queue?.firstLeadId).toBeNull()
     })
+
+    it('previewNames shows up to 3 company names', () => {
+      const leads = [
+        createMockLead({ id: '1', status: 'Nuevo', companyName: 'Alpha' }),
+        createMockLead({ id: '2', status: 'Nuevo', companyName: 'Beta' }),
+        createMockLead({ id: '3', status: 'Nuevo', companyName: 'Gamma' }),
+        createMockLead({ id: '4', status: 'Nuevo', companyName: 'Delta' }),
+      ]
+
+      const queues = buildWorkQueues(leads)
+      const queue = queues.find((q) => q.id === 'pendiente_revisar')
+
+      expect(queue?.previewNames).toEqual(['Alpha', 'Beta', 'Gamma'])
+    })
   })
 
   describe('WorkQueueId type', () => {
-    it('includes all 6 queue IDs', () => {
+    it('includes all 5 queue IDs', () => {
       const validIds: WorkQueueId[] = [
         'pendiente_revisar',
         'faltan_datos',
         'emails_listos',
         'followup_overdue',
         'duplicados',
-        'archivados',
       ]
 
-      for (const id of validIds) {
-        expect(typeof id).toBe('string')
-      }
+      expect(validIds).toEqual([...WORK_QUEUE_IDS])
     })
   })
 })

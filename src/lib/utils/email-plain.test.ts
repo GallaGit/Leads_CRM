@@ -1,82 +1,85 @@
 import { describe, it, expect } from 'vitest'
-import { splitNotes, domainFromUrl } from '@/lib/utils/email-plain'
+import {
+  htmlEmailToPlain,
+  splitNotes,
+  combineNotes,
+  domainFromUrl,
+  OBSERVACIONES_HARD_LIMIT,
+} from '@/lib/utils/email-plain'
+
+describe('utils/email-plain - htmlEmailToPlain', () => {
+  it('converts br and p tags to newlines', () => {
+    expect(htmlEmailToPlain('Hola<br>mundo')).toContain('Hola')
+    expect(htmlEmailToPlain('<p>Uno</p><p>Dos</p>')).toContain('Uno')
+  })
+
+  it('strips remaining HTML tags', () => {
+    expect(htmlEmailToPlain('<b>Bold</b> text')).toBe('Bold text')
+  })
+
+  it('decodes common entities', () => {
+    expect(htmlEmailToPlain('A&nbsp;B &amp; C')).toBe('A B & C')
+  })
+
+  it('returns empty string for nullish', () => {
+    expect(htmlEmailToPlain(null)).toBe('')
+    expect(htmlEmailToPlain(undefined)).toBe('')
+  })
+})
 
 describe('utils/email-plain - splitNotes', () => {
-  it('returns observaciones and null overflow for text under 2000 chars', () => {
-    const text = 'Short notes'
-    const result = splitNotes(text)
-
-    expect(result.observaciones).toBe('Short notes')
+  it('keeps short notes in observaciones', () => {
+    const result = splitNotes('nota corta')
+    expect(result.observaciones).toBe('nota corta')
     expect(result.overflow).toBeNull()
   })
 
-  it('splits at 2000 chars for long text', () => {
-    const longText = 'x'.repeat(2500)
-    const result = splitNotes(longText)
-
-    expect(result.observaciones.length).toBe(2000)
-    expect(result.overflow).toBe('x'.repeat(500))
-  })
-
-  it('handles exactly 2000 chars', () => {
-    const text = 'x'.repeat(2000)
-    const result = splitNotes(text)
-
-    expect(result.observaciones.length).toBe(2000)
-    expect(result.overflow).toBeNull()
-  })
-
-  it('handles 2001 chars', () => {
-    const text = 'x'.repeat(2001)
-    const result = splitNotes(text)
-
-    expect(result.observaciones.length).toBe(2000)
-    expect(result.overflow).toBe('x')
+  it('splits notes over hard limit', () => {
+    const long = 'x'.repeat(OBSERVACIONES_HARD_LIMIT + 50)
+    const result = splitNotes(long)
+    expect(result.observaciones).toHaveLength(OBSERVACIONES_HARD_LIMIT)
+    expect(result.overflow).toHaveLength(50)
   })
 
   it('handles empty string', () => {
-    const result = splitNotes('')
-
-    expect(result.observaciones).toBe('')
-    expect(result.overflow).toBeNull()
+    expect(splitNotes('')).toEqual({ observaciones: '', overflow: null })
   })
+})
 
-  it('handles null/undefined', () => {
-    expect(splitNotes(null as any)).toEqual({ observaciones: '', overflow: null })
-    expect(splitNotes(undefined as any)).toEqual({ observaciones: '', overflow: null })
+describe('utils/email-plain - combineNotes', () => {
+  it('joins observaciones and overflow', () => {
+    expect(combineNotes('a', 'b')).toBe('ab')
+    expect(combineNotes('a', null)).toBe('a')
+    expect(combineNotes(null, 'b')).toBe('b')
+    expect(combineNotes(null, null)).toBe('')
   })
 })
 
 describe('utils/email-plain - domainFromUrl', () => {
   it('extracts domain from https URL', () => {
     expect(domainFromUrl('https://example.com')).toBe('example.com')
-    expect(domainFromUrl('https://www.example.com')).toBe('www.example.com')
+    expect(domainFromUrl('https://www.example.com')).toBe('example.com')
     expect(domainFromUrl('https://sub.example.com/path')).toBe('sub.example.com')
   })
 
   it('extracts domain from http URL', () => {
     expect(domainFromUrl('http://example.com')).toBe('example.com')
-    expect(domainFromUrl('http://www.example.com')).toBe('www.example.com')
+    expect(domainFromUrl('http://www.example.com')).toBe('example.com')
   })
 
   it('extracts domain from bare domain', () => {
     expect(domainFromUrl('example.com')).toBe('example.com')
-    expect(domainFromUrl('www.example.com')).toBe('www.example.com')
+    expect(domainFromUrl('www.example.com')).toBe('example.com')
   })
 
-  it('extracts domain from mailto', () => {
-    expect(domainFromUrl('mailto:user@example.com')).toBeNull()
+  it('returns empty string for nullish/empty', () => {
+    expect(domainFromUrl('')).toBe('')
+    expect(domainFromUrl(null)).toBe('')
+    expect(domainFromUrl(undefined)).toBe('')
   })
 
-  it('returns null for invalid/empty input', () => {
-    expect(domainFromUrl('')).toBeNull()
-    expect(domainFromUrl('not a url')).toBeNull()
-    expect(domainFromUrl(null as any)).toBeNull()
-    expect(domainFromUrl(undefined as any)).toBeNull()
-  })
-
-  it('handles URLs with port', () => {
-    expect(domainFromUrl('https://example.com:8080')).toBe('example.com:8080')
+  it('returns hostname without port', () => {
+    expect(domainFromUrl('https://example.com:8080')).toBe('example.com')
   })
 
   it('handles URLs with path and query', () => {

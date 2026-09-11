@@ -2,39 +2,49 @@ import { describe, it, expect } from 'vitest'
 import { filterLeads } from '@/lib/leads/filter-leads'
 import type { Lead, LeadStatus, LeadFilters } from '@/lib/domain/lead'
 
-const createMockLead = (overrides: Partial<Lead> = {}): Lead => ({
-  id: `lead-${Math.random().toString(36).slice(2)}`,
-  companyName: 'Test Company',
-  website: 'https://test.com',
-  phone: '+34 600 111 222',
-  address: 'Calle Test 123',
-  postalCode: '46001',
-  city: 'Valencia',
-  cityCanonical: 'Valencia',
-  province: 'Valencia',
-  employees: 10,
-  linkedin: 'https://linkedin.com/company/test',
-  services: ['Asesoría'],
-  status: 'Nuevo' as LeadStatus,
-  lastActivity: new Date().toISOString(),
-  discoveredAt: new Date().toISOString(),
-  notes: '',
-  notesOverflow: null,
-  email: 'test@test.com',
-  emailCommercial: null,
-  emailManager: null,
-  score: 50,
-  manager: 'John Doe',
-  role: 'CEO',
-  confidence: 'Alta',
-  software: 'ERP',
-  source: 'n8n',
-  favorite: false,
-  archived: false,
-  aiAnalysis: null,
-  nextFollowUp: null,
-  ...overrides,
-})
+const createMockLead = (overrides: Partial<Lead> = {}): Lead => {
+  const id = overrides.id ?? `lead-${Math.random().toString(36).slice(2)}`
+  const slug = id.replace(/[^a-z0-9]+/gi, '-').toLowerCase()
+  return {
+    id,
+    url: `https://notion.so/${slug}`,
+    companyName: 'Test Company',
+    website: 'https://test.com',
+    phone: '+34 600 111 222',
+    address: 'Calle Test 123',
+    postalCode: '46001',
+    city: 'Valencia',
+    cityCanonical: 'Valencia',
+    province: 'Valencia',
+    employees: 10,
+    linkedin: 'https://linkedin.com/company/test',
+    services: ['Asesoría'],
+    status: 'Nuevo' as LeadStatus,
+    lastActivity: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    discoveredAt: new Date().toISOString(),
+    notes: null,
+    notesOverflow: null,
+    email: 'test@test.com',
+    emailCommercial: null,
+    emailManager: null,
+    emailSubject: null,
+    emailBody: null,
+    score: 50,
+    manager: 'John Doe',
+    role: 'CEO',
+    confidence: 'Alta',
+    software: 'ERP',
+    source: 'n8n',
+    favorite: false,
+    archived: false,
+    aiAnalysis: null,
+    lastContact: null,
+    nextFollowUp: null,
+    lastEditedTime: null,
+    ...overrides,
+  }
+}
 
 const createFilters = (overrides: Partial<LeadFilters> = {}): LeadFilters => ({
   search: '',
@@ -43,12 +53,12 @@ const createFilters = (overrides: Partial<LeadFilters> = {}): LeadFilters => ({
   city: [],
   employeesMin: undefined,
   employeesMax: undefined,
-  discoveredFrom: undefined,
-  discoveredTo: undefined,
+  createdFrom: undefined,
+  createdTo: undefined,
   hasEmail: undefined,
   hasPhone: undefined,
-  hasWeb: undefined,
-  hasLinkedIn: undefined,
+  hasWebsite: undefined,
+  hasLinkedin: undefined,
   ...overrides,
 })
 
@@ -67,8 +77,8 @@ describe('filter-leads - filterLeads', () => {
   describe('search filter', () => {
     it('filters by company name', () => {
       const leads = [
-        createMockLead({ id: '1', companyName: 'Asesoría Valencia' }),
-        createMockLead({ id: '2', companyName: 'Gestoría Madrid' }),
+        createMockLead({ id: '1', companyName: 'Asesoría Valencia', city: null, cityCanonical: null, province: null }),
+        createMockLead({ id: '2', companyName: 'Gestoría Madrid', city: null, cityCanonical: null, province: null }),
       ]
 
       const result = filterLeads(leads, createFilters({ search: 'Valencia' }))
@@ -79,8 +89,8 @@ describe('filter-leads - filterLeads', () => {
 
     it('filters by website domain', () => {
       const leads = [
-        createMockLead({ id: '1', website: 'https://valencia.com' }),
-        createMockLead({ id: '2', website: 'https://madrid.com' }),
+        createMockLead({ id: '1', website: 'https://valencia.com', city: null, cityCanonical: null, province: null }),
+        createMockLead({ id: '2', website: 'https://madrid.com', city: null, cityCanonical: null, province: null }),
       ]
 
       const result = filterLeads(leads, createFilters({ search: 'valencia' }))
@@ -91,8 +101,8 @@ describe('filter-leads - filterLeads', () => {
 
     it('filters by email', () => {
       const leads = [
-        createMockLead({ id: '1', email: 'test@valencia.com' }),
-        createMockLead({ id: '2', email: 'test@madrid.com' }),
+        createMockLead({ id: '1', email: 'test@valencia.com', city: null, cityCanonical: null, province: null }),
+        createMockLead({ id: '2', email: 'test@madrid.com', city: null, cityCanonical: null, province: null }),
       ]
 
       const result = filterLeads(leads, createFilters({ search: 'valencia' }))
@@ -103,8 +113,8 @@ describe('filter-leads - filterLeads', () => {
 
     it('filters by city', () => {
       const leads = [
-        createMockLead({ id: '1', city: 'Valencia', cityCanonical: 'Valencia' }),
-        createMockLead({ id: '2', city: 'Madrid', cityCanonical: 'Madrid' }),
+        createMockLead({ id: '1', city: 'Valencia', cityCanonical: 'Valencia', province: null }),
+        createMockLead({ id: '2', city: 'Madrid', cityCanonical: 'Madrid', province: null }),
       ]
 
       const result = filterLeads(leads, createFilters({ search: 'Valencia' }))
@@ -115,8 +125,8 @@ describe('filter-leads - filterLeads', () => {
 
     it('filters by province', () => {
       const leads = [
-        createMockLead({ id: '1', province: 'Valencia' }),
-        createMockLead({ id: '2', province: 'Madrid' }),
+        createMockLead({ id: '1', province: 'Valencia', city: null, cityCanonical: null }),
+        createMockLead({ id: '2', province: 'Madrid', city: null, cityCanonical: null }),
       ]
 
       const result = filterLeads(leads, createFilters({ search: 'Valencia' }))
@@ -127,8 +137,8 @@ describe('filter-leads - filterLeads', () => {
 
     it('filters by LinkedIn', () => {
       const leads = [
-        createMockLead({ id: '1', linkedin: 'https://linkedin.com/company/valencia' }),
-        createMockLead({ id: '2', linkedin: 'https://linkedin.com/company/madrid' }),
+        createMockLead({ id: '1', linkedin: 'https://linkedin.com/company/valencia', city: null, cityCanonical: null, province: null }),
+        createMockLead({ id: '2', linkedin: 'https://linkedin.com/company/madrid', city: null, cityCanonical: null, province: null }),
       ]
 
       const result = filterLeads(leads, createFilters({ search: 'valencia' }))
@@ -138,7 +148,7 @@ describe('filter-leads - filterLeads', () => {
     })
 
     it('is case insensitive', () => {
-      const leads = [createMockLead({ id: '1', companyName: 'Asesoría Valencia' })]
+      const leads = [createMockLead({ id: '1', companyName: 'Asesoría Valencia', city: null, cityCanonical: null, province: null })]
 
       const result = filterLeads(leads, createFilters({ search: 'VALENCIA' }))
 
@@ -293,29 +303,29 @@ describe('filter-leads - filterLeads', () => {
   })
 
   describe('date range filter', () => {
-    it('filters by discoveredFrom (inclusive)', () => {
+    it('filters by createdFrom (inclusive)', () => {
       const date = '2024-01-15'
       const leads = [
-        createMockLead({ id: '1', discoveredAt: '2024-01-10T10:00:00Z' }),
-        createMockLead({ id: '2', discoveredAt: '2024-01-15T10:00:00Z' }),
-        createMockLead({ id: '3', discoveredAt: '2024-01-20T10:00:00Z' }),
+        createMockLead({ id: '1', createdAt: '2024-01-10T10:00:00Z' }),
+        createMockLead({ id: '2', createdAt: '2024-01-15T10:00:00Z' }),
+        createMockLead({ id: '3', createdAt: '2024-01-20T10:00:00Z' }),
       ]
 
-      const result = filterLeads(leads, createFilters({ discoveredFrom: date }))
+      const result = filterLeads(leads, createFilters({ createdFrom: date }))
 
       expect(result).toHaveLength(2)
       expect(result.map((l) => l.id).sort()).toEqual(['2', '3'])
     })
 
-    it('filters by discoveredTo (inclusive)', () => {
+    it('filters by createdTo (inclusive)', () => {
       const date = '2024-01-15'
       const leads = [
-        createMockLead({ id: '1', discoveredAt: '2024-01-10T10:00:00Z' }),
-        createMockLead({ id: '2', discoveredAt: '2024-01-15T10:00:00Z' }),
-        createMockLead({ id: '3', discoveredAt: '2024-01-20T10:00:00Z' }),
+        createMockLead({ id: '1', createdAt: '2024-01-10T10:00:00Z' }),
+        createMockLead({ id: '2', createdAt: '2024-01-15T10:00:00Z' }),
+        createMockLead({ id: '3', createdAt: '2024-01-20T10:00:00Z' }),
       ]
 
-      const result = filterLeads(leads, createFilters({ discoveredTo: date }))
+      const result = filterLeads(leads, createFilters({ createdTo: date }))
 
       expect(result).toHaveLength(2)
       expect(result.map((l) => l.id).sort()).toEqual(['1', '2'])
@@ -323,14 +333,14 @@ describe('filter-leads - filterLeads', () => {
 
     it('filters by date range', () => {
       const leads = [
-        createMockLead({ id: '1', discoveredAt: '2024-01-10T10:00:00Z' }),
-        createMockLead({ id: '2', discoveredAt: '2024-01-15T10:00:00Z' }),
-        createMockLead({ id: '3', discoveredAt: '2024-01-20T10:00:00Z' }),
+        createMockLead({ id: '1', createdAt: '2024-01-10T10:00:00Z' }),
+        createMockLead({ id: '2', createdAt: '2024-01-15T10:00:00Z' }),
+        createMockLead({ id: '3', createdAt: '2024-01-20T10:00:00Z' }),
       ]
 
       const result = filterLeads(leads, createFilters({
-        discoveredFrom: '2024-01-12',
-        discoveredTo: '2024-01-18',
+        createdFrom: '2024-01-12',
+        createdTo: '2024-01-18',
       }))
 
       expect(result).toHaveLength(1)
@@ -339,7 +349,7 @@ describe('filter-leads - filterLeads', () => {
   })
 
   describe('has flags filter', () => {
-    it('hasEmail=true filters leads with any email', () => {
+    it('hasEmail=true filters leads with primary email only', () => {
       const leads = [
         createMockLead({ id: '1', email: 'test@test.com' }),
         createMockLead({ id: '2', email: null, emailCommercial: 'comercial@test.com' }),
@@ -348,10 +358,11 @@ describe('filter-leads - filterLeads', () => {
 
       const result = filterLeads(leads, createFilters({ hasEmail: true }))
 
-      expect(result).toHaveLength(2)
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe('1')
     })
 
-    it('hasEmail=false filters leads without any email', () => {
+    it('hasEmail=false filters leads without primary email', () => {
       const leads = [
         createMockLead({ id: '1', email: 'test@test.com' }),
         createMockLead({ id: '2', email: null, emailCommercial: null, emailManager: null }),
@@ -375,25 +386,25 @@ describe('filter-leads - filterLeads', () => {
       expect(result[0].id).toBe('1')
     })
 
-    it('hasWeb filters by website presence', () => {
+    it('hasWebsite filters by website presence', () => {
       const leads = [
         createMockLead({ id: '1', website: 'https://test.com' }),
         createMockLead({ id: '2', website: null }),
       ]
 
-      const result = filterLeads(leads, createFilters({ hasWeb: true }))
+      const result = filterLeads(leads, createFilters({ hasWebsite: true }))
 
       expect(result).toHaveLength(1)
       expect(result[0].id).toBe('1')
     })
 
-    it('hasLinkedIn filters by LinkedIn presence', () => {
+    it('hasLinkedin filters by LinkedIn presence', () => {
       const leads = [
         createMockLead({ id: '1', linkedin: 'https://linkedin.com/company/test' }),
         createMockLead({ id: '2', linkedin: null }),
       ]
 
-      const result = filterLeads(leads, createFilters({ hasLinkedIn: true }))
+      const result = filterLeads(leads, createFilters({ hasLinkedin: true }))
 
       expect(result).toHaveLength(1)
       expect(result[0].id).toBe('1')
@@ -421,9 +432,9 @@ describe('filter-leads - filterLeads', () => {
 
     it('search combines with other filters', () => {
       const leads = [
-        createMockLead({ id: '1', companyName: 'Asesoría Valencia', status: 'Nuevo', province: 'Valencia' }),
-        createMockLead({ id: '2', companyName: 'Gestoría Valencia', status: 'Validado', province: 'Valencia' }),
-        createMockLead({ id: '3', companyName: 'Asesoría Madrid', status: 'Nuevo', province: 'Madrid' }),
+        createMockLead({ id: '1', companyName: 'Asesoría Valencia', status: 'Nuevo', province: 'Valencia', city: null, cityCanonical: null }),
+        createMockLead({ id: '2', companyName: 'Gestoría Valencia', status: 'Validado', province: 'Valencia', city: null, cityCanonical: null }),
+        createMockLead({ id: '3', companyName: 'Asesoría Madrid', status: 'Nuevo', province: 'Madrid', city: null, cityCanonical: null }),
       ]
 
       const result = filterLeads(leads, createFilters({

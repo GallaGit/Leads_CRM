@@ -87,7 +87,7 @@ export function createLeadMinimal(overrides: Partial<Lead> = {}): Lead {
 }
 
 export function createLeadsArray(count: number, overrides: Partial<Lead> = {}): Lead[] {
-  return Array.from({ length: count }, (_, i) =>
+  return Array.from({ length: count }, () =>
     createLead({ ...overrides, id: overrides.id ?? faker.string.uuid() }),
   )
 }

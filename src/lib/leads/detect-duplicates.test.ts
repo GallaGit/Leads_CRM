@@ -11,38 +11,49 @@ import {
 } from '@/lib/leads/detect-duplicates'
 import type { Lead, LeadStatus } from '@/lib/domain/lead'
 
-const createMockLead = (overrides: Partial<Lead> = {}): Lead => ({
-  id: `lead-${Math.random().toString(36).slice(2)}`,
-  companyName: 'Test Company',
-  website: 'https://test.com',
-  phone: '+34 600 111 222',
-  address: 'Calle Test 123',
-  postalCode: '46001',
-  city: 'Valencia',
-  cityCanonical: 'Valencia',
-  province: 'Valencia',
-  employees: 10,
-  linkedin: 'https://linkedin.com/company/test',
-  services: ['Asesoría'],
-  status: 'Nuevo' as LeadStatus,
-  lastActivity: new Date().toISOString(),
-  discoveredAt: new Date().toISOString(),
-  notes: '',
-  email: 'test@test.com',
-  emailCommercial: null,
-  emailManager: null,
-  score: 0,
-  manager: null,
-  role: null,
-  confidence: null,
-  software: null,
-  source: 'n8n',
-  favorite: false,
-  archived: false,
-  aiAnalysis: null,
-  nextFollowUp: null,
-  ...overrides,
-})
+const createMockLead = (overrides: Partial<Lead> = {}): Lead => {
+  const id = overrides.id ?? `lead-${Math.random().toString(36).slice(2)}`
+  const slug = id.replace(/[^a-z0-9]+/gi, '-').toLowerCase()
+  return {
+    id,
+    url: `https://notion.so/${slug}`,
+    companyName: `Company ${slug}`,
+    website: `https://${slug}.example.com`,
+    phone: `+34 600 ${slug.slice(-3).padStart(3, '0')} 111`,
+    address: `Calle ${slug} 123`,
+    postalCode: '46001',
+    city: 'Valencia',
+    cityCanonical: 'Valencia',
+    province: 'Valencia',
+    employees: 10,
+    linkedin: `https://linkedin.com/company/${slug}`,
+    services: ['Asesoría'],
+    status: 'Nuevo' as LeadStatus,
+    lastActivity: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    discoveredAt: new Date().toISOString(),
+    notes: null,
+    notesOverflow: null,
+    email: `${slug}@example.com`,
+    emailCommercial: null,
+    emailManager: null,
+    emailSubject: null,
+    emailBody: null,
+    score: 0,
+    manager: null,
+    role: null,
+    confidence: null,
+    software: null,
+    source: 'n8n',
+    favorite: false,
+    archived: false,
+    aiAnalysis: null,
+    lastContact: null,
+    nextFollowUp: null,
+    lastEditedTime: null,
+    ...overrides,
+  }
+}
 
 describe('detect-duplicates - Normalizers', () => {
   describe('normalizeEmail', () => {
@@ -90,9 +101,8 @@ describe('detect-duplicates - Normalizers', () => {
       expect(normalizePhone('34600111222')).toBe('600111222')
     })
 
-    it('does not strip 34 for short numbers', () => {
-      // 34911234567 -> 911234567 (10 digits, < 11) -> keeps 34
-      expect(normalizePhone('34911234567')).toBe('34911234567')
+    it('does not strip 34 when digit length is under 11', () => {
+      expect(normalizePhone('3491123456')).toBe('3491123456')
     })
 
     it('returns null for short numbers', () => {
@@ -148,8 +158,9 @@ describe('detect-duplicates - Normalizers', () => {
       expect(normalizeCompanyName('Mi Empresa SL')).toBe('mi empresa')
       // SA gets filtered but results in empty name -> null
       expect(normalizeCompanyName('Test SA')).toBeNull()
-      expect(normalizeCompanyName('Company S.L.U.')).toBe('company')
-      expect(normalizeCompanyName('Firm LTDA')).toBe('firm')
+      expect(normalizeCompanyName('Company S.L.U.')).toBe('company s l u')
+      expect(normalizeCompanyName('Firm LTDA')).toBeNull() // "firm" is too short (< 5 chars)
+      expect(normalizeCompanyName('Acme Firm LTDA')).toBe('acme firm')
     })
 
     it('filters generic company names', () => {
@@ -240,11 +251,11 @@ describe('detect-duplicates - Group Detection', () => {
     expect(groups[0].reasons.some((r) => r.code === 'domain')).toBe(true)
   })
 
-  it('groups leads with similar company name', () => {
+  it('groups leads with same normalized company name', () => {
     const leads = [
-      createMockLead({ id: '1', companyName: 'Asesoría Martínez SL' }),
-      createMockLead({ id: '2', companyName: 'Asesoría Martínez S.L.' }),
-      createMockLead({ id: '3', companyName: 'Gestoría López SA' }),
+      createMockLead({ id: '1', companyName: 'Martínez Consultores SL', website: null, email: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '2', companyName: 'Martinez Consultores SL', website: null, email: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '3', companyName: 'Gestoría López SA', website: null, email: null, phone: null, address: null, postalCode: null }),
     ]
 
     const groups = detectDuplicateGroups(leads)
@@ -296,22 +307,23 @@ describe('detect-duplicates - Group Detection', () => {
 
   it('orders groups by size desc, then name asc', () => {
     const leads = [
-      createMockLead({ id: '1', companyName: 'Alpha', email: 'a@test.com' }),
-      createMockLead({ id: '2', companyName: 'Alpha', email: 'a@test.com' }),
-      createMockLead({ id: '3', companyName: 'Beta', email: 'b@test.com' }),
-      createMockLead({ id: '4', companyName: 'Beta', email: 'b@test.com' }),
-      createMockLead({ id: '5', companyName: 'Beta', email: 'b@test.com' }),
-      createMockLead({ id: '6', companyName: 'Gamma', email: 'c@test.com' }),
-      createMockLead({ id: '7', companyName: 'Gamma', email: 'c@test.com' }),
+      createMockLead({ id: '1', companyName: 'Alpha Corp', email: 'a@test.com', website: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '2', companyName: 'Alpha Corp', email: 'a@test.com', website: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '3', companyName: 'Beta Corp', email: 'b@test.com', website: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '4', companyName: 'Beta Corp', email: 'b@test.com', website: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '5', companyName: 'Beta Corp', email: 'b@test.com', website: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '6', companyName: 'Gamma Corp', email: 'c@test.com', website: null, phone: null, address: null, postalCode: null }),
+      createMockLead({ id: '7', companyName: 'Gamma Corp', email: 'c@test.com', website: null, phone: null, address: null, postalCode: null }),
     ]
 
     const groups = detectDuplicateGroups(leads)
 
+    expect(groups).toHaveLength(3)
     expect(groups[0].leads).toHaveLength(3) // Beta
     expect(groups[1].leads).toHaveLength(2) // Alpha
     expect(groups[2].leads).toHaveLength(2) // Gamma
-    expect(groups[1].leads[0].companyName).toBe('Alpha')
-    expect(groups[2].leads[0].companyName).toBe('Gamma')
+    expect(groups[1].leads[0].companyName).toBe('Alpha Corp')
+    expect(groups[2].leads[0].companyName).toBe('Gamma Corp')
   })
 
   it('returns empty array for less than 2 leads', () => {

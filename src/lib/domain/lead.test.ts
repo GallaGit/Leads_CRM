@@ -3,7 +3,6 @@ import {
   LEAD_STATUSES,
   PROVINCES,
   isLeadStatus,
-  type LeadStatus,
   type Lead,
 } from '@/lib/domain/lead'
 
@@ -44,8 +43,8 @@ describe('domain/lead - isLeadStatus', () => {
     expect(isLeadStatus('Contactado')).toBe(false) // legacy
     expect(isLeadStatus('Contratado')).toBe(false) // legacy
     expect(isLeadStatus('')).toBe(false)
-    expect(isLeadStatus(null as any)).toBe(false)
-    expect(isLeadStatus(undefined as any)).toBe(false)
+    expect(isLeadStatus(null)).toBe(false)
+    expect(isLeadStatus(undefined)).toBe(false)
   })
 })
 

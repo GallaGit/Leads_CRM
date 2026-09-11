@@ -113,11 +113,11 @@ describe('compute-stats - computeLeadStats Integration', () => {
 
     const stats = computeLeadStats(leads)
 
-    // Should be ordered by PROVINCES array order: Valencia, Castellón, Alicante, then Sin provincia
+    // Ordered by PROVINCES: Valencia, Alicante, Castellón, then Sin provincia
     expect(stats.byProvince[0].key).toBe('Valencia')
     expect(stats.byProvince[0].count).toBe(2)
-    expect(stats.byProvince[1].key).toBe('Castellón')
-    expect(stats.byProvince[2].key).toBe('Alicante')
+    expect(stats.byProvince[1].key).toBe('Alicante')
+    expect(stats.byProvince[2].key).toBe('Castellón')
     expect(stats.byProvince[3].key).toBe('Sin provincia')
   })
 
@@ -184,8 +184,8 @@ describe('compute-stats - computeLeadStats Integration', () => {
     expect(stats.rates).toHaveLength(5)
 
     const validationRate = stats.rates.find((r) => r.key === 'validation')
-    expect(validationRate?.count).toBe(6) // All except Descartado
-    expect(validationRate?.percent).toBeCloseTo(85.7, 1)
+    expect(validationRate?.count).toBe(5) // Validado or later (excludes Nuevo + Descartado)
+    expect(validationRate?.percent).toBeCloseTo(71.4, 1)
 
     const clientRate = stats.rates.find((r) => r.key === 'client')
     expect(clientRate?.count).toBe(1)

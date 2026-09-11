@@ -120,7 +120,7 @@ describe('geo/cities - Constants', () => {
     expect(Array.isArray(CANONICAL_CITIES)).toBe(true)
     expect(CANONICAL_CITIES.length).toBe(18)
     expect(CANONICAL_CITIES).toEqual([
-      'Alboraya', 'Aldaia', 'Burjassot', 'Catarroja', 'Castellón',
+      'Alboraya', 'Aldaia', 'Burjassot', 'Castellón', 'Catarroja',
       'El Puig', 'Godella', 'Manises', 'Mislata', 'Moncada',
       'Paiporta', 'Paterna', 'Picassent', 'Sagunto', 'Silla',
       'Torrent', 'Valencia', 'Xirivella',

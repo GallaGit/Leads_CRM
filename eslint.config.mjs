@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Agent skill fixtures / generated test assets (not app code)
+    ".agents/**",
+    ".opencode/**",
   ]),
 ]);
 

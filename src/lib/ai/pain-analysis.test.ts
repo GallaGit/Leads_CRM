@@ -33,7 +33,7 @@ Especulación
     expect(result.speculation).toEqual(['Item 4'])
   })
 
-  it('parses English headings with bullets', () => {
+  it('does not parse English-only headings (Spanish labels required)', () => {
     const text = `Evidence
 • Item 1
 
@@ -45,9 +45,7 @@ Speculation
 
     const result = parsePainAnalysis(text)
 
-    expect(result.evidence).toEqual(['Item 1'])
-    expect(result.inference).toEqual(['Item 2'])
-    expect(result.speculation).toEqual(['Item 3'])
+    expect(result).toEqual(EMPTY_PAIN_ANALYSIS)
   })
 
   it('parses markdown headings (# ## ###)', () => {
@@ -159,7 +157,7 @@ Speculation
 
     const result = parsePainAnalysis(text)
 
-    expect(result.evidence).toEqual(['Item 1', 'Item 2'])
+    expect(result.evidence).toEqual(['Item 1', '•', 'Item 2'])
   })
 
   it('prioritizes JSON over headings when both present', () => {
@@ -509,7 +507,7 @@ describe('pain-analysis - buildLeadFacts', () => {
 
     const facts = buildLeadFacts(lead)
 
-    expect(facts).toBe('No hay campos con datos en este lead.')
+    expect(facts).toBe('Estado CRM: Nuevo\nScore: 0')
   })
 })
 

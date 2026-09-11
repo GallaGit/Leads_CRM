@@ -165,11 +165,7 @@ export const handlers = [
     return HttpResponse.json({ object: 'list', results: [] })
   }),
 
-  http.post('https://api.groq.com/openai/v1/chat/completions', async ({ request }) => {
-    const body = await request.json() as { messages?: Array<{ content: string }> }
-
-    const userMessage = body.messages?.find((m) => m.role === 'user')?.content ?? ''
-
+  http.post('https://api.groq.com/openai/v1/chat/completions', async () => {
     return HttpResponse.json({
       choices: [
         {
