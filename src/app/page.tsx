@@ -171,11 +171,11 @@ export default function HomePage() {
           })}
         </div>
         <div className="mt-6 flex flex-wrap gap-2">
-          <Button asChild>
-            <Link href="/inbox">Daily Work</Link>
+          <Button onClick={() => router.push("/inbox")}>
+            Daily Work
           </Button>
-          <Button asChild variant="outline">
-            <Link href="/leads">Ir a Leads</Link>
+          <Button variant="outline" onClick={() => router.push("/leads")}>
+            Ir a Leads
           </Button>
         </div>
       </div>

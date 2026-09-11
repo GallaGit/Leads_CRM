@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function Switch({
@@ -16,25 +17,30 @@ export function Switch({
   label?: string;
 }) {
   return (
-    <button
-      id={id}
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      disabled={disabled}
-      onClick={() => onCheckedChange(!checked)}
-      className={cn(
-        "relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:opacity-50",
-        checked ? "bg-[var(--accent)]" : "bg-[var(--muted-hover)]",
-      )}
-    >
-      <span
+    <label className="inline-flex items-center gap-3 cursor-pointer" htmlFor={id}>
+      <button
+        id={id}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        disabled={disabled}
+        onClick={() => !disabled && onCheckedChange(!checked)}
         className={cn(
-          "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform",
-          checked ? "left-4" : "left-0.5",
+          "relative h-5 w-9 shrink-0 rounded-full transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rojo focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
+          checked ? "bg-rojo" : "bg-gris-300 dark:bg-gris-600",
         )}
-      />
-    </button>
+      >
+        <motion.span
+          className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-blanco shadow-md"
+          animate={{ x: checked ? 20 : 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          aria-hidden="true"
+        />
+      </button>
+      {label && (
+        <span className="text-sm text-grafito dark:text-gris-100 select-none">{label}</span>
+      )}
+    </label>
   );
 }
