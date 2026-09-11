@@ -5,21 +5,37 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { syncLeadsFromApi } from "@/hooks/use-ensure-leads-synced";
 import { useUiStore } from "@/store/ui-store";
+import { cn } from "@/lib/utils";
 
-export function Topbar({ title }: { title: string }) {
+export function Topbar({
+  title,
+  subtitle,
+}: { title: string; subtitle?: string }) {
   const { theme, setTheme, mounted } = useTheme();
   const syncState = useUiStore((s) => s.syncState);
   const lastSyncAt = useUiStore((s) => s.lastSyncAt);
   const syncError = useUiStore((s) => s.syncError);
 
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--panel)] px-4">
-      <h1 className="text-sm font-semibold text-[var(--fg)]">{title}</h1>
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-gris-200 dark:border-gris-700 bg-blanco dark:bg-grafito px-4">
+      <div>
+        <h1 className="text-lg font-semibold text-grafito dark:text-gris-100">{title}</h1>
+        {subtitle && (
+          <p className="text-sm text-gris-500 dark:text-gris-400">{subtitle}</p>
+        )}
+      </div>
       <div className="flex items-center gap-2">
-        <div className="hidden text-[11px] text-[var(--muted-fg)] sm:block">
-          {syncState === "syncing" && "Sincronizando…"}
+        <div className="hidden text-sm text-gris-500 dark:text-gris-400 sm:block">
+          {syncState === "syncing" && (
+            <span className="flex items-center gap-1.5 text-info">
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              Sincronizando…
+            </span>
+          )}
           {syncState === "error" && (
-            <span className="text-red-400">Error: {syncError}</span>
+            <span className="flex items-center gap-1.5 text-error">
+              Error: {syncError}
+            </span>
           )}
           {syncState === "idle" && lastSyncAt && (
             <span>
@@ -32,13 +48,14 @@ export function Topbar({ title }: { title: string }) {
           )}
         </div>
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
           onClick={() => void syncLeadsFromApi({ force: true, notifySuccess: true })}
           disabled={syncState === "syncing"}
+          className="gap-1.5"
         >
           <RefreshCw
-            className={`h-3.5 w-3.5 ${syncState === "syncing" ? "animate-spin" : ""}`}
+            className={cn("h-3.5 w-3.5 transition-transform", syncState === "syncing" && "animate-spin")}
           />
           Sincronizar
         </Button>
@@ -51,9 +68,9 @@ export function Topbar({ title }: { title: string }) {
           {!mounted ? (
             <span className="h-4 w-4" />
           ) : theme === "dark" ? (
-            <Sun className="h-4 w-4" />
+            <Sun className="h-4 w-4" aria-hidden="true" />
           ) : (
-            <Moon className="h-4 w-4" />
+            <Moon className="h-4 w-4" aria-hidden="true" />
           )}
         </Button>
       </div>

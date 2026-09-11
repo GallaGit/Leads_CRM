@@ -75,8 +75,8 @@ export function DailyWorkPage() {
                 </p>
               )}
               <div className="mt-3">
-                <Button size="sm" variant="secondary" asChild>
-                  <span>Abrir cola</span>
+                <Button size="sm" variant="secondary" onClick={() => openQueue(q)}>
+                  Abrir cola
                 </Button>
               </div>
             </button>
