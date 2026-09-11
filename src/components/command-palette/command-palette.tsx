@@ -34,47 +34,49 @@ interface CommandPaletteProps {
 export function CommandPalette({ sections, open, onOpenChange, placeholder = "Buscar comandos..." }: CommandPaletteProps) {
   const [query, setQuery] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [filteredItems, setFilteredItems] = React.useState<{ item: CommandItem; sectionId: string }[]>([]);
+  const [prevOpen, setPrevOpen] = React.useState(open);
   const reduced = useReducedMotion();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLUListElement>(null);
+
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setQuery("");
+      setSelectedIndex(0);
+    }
+  }
 
   const allItems = React.useMemo(
     () => sections.flatMap((section) => section.items.map((item) => ({ item, sectionId: section.id }))),
     [sections]
   );
 
-  React.useEffect(() => {
-    if (!query) {
-      setFilteredItems(allItems);
-    } else {
-      const lowerQuery = query.toLowerCase();
-      const scored = allItems
-        .map(({ item, sectionId }) => {
-          const keywords = [item.label, item.description, ...(item.keywords || [])].join(" ").toLowerCase();
-          const labelMatch = item.label.toLowerCase().includes(lowerQuery);
-          const descMatch = item.description?.toLowerCase().includes(lowerQuery);
-          const keywordMatch = keywords.includes(lowerQuery);
-          let score = 0;
-          if (labelMatch) score += 10;
-          if (descMatch) score += 5;
-          if (keywordMatch) score += 2;
-          if (item.label.toLowerCase().startsWith(lowerQuery)) score += 20;
-          return score > 0 ? { item, sectionId, score } : null;
-        })
-        .filter((v): v is { item: CommandItem; sectionId: string; score: number } => v !== null)
-        .sort((a, b) => b.score - a.score)
-        .map(({ item, sectionId }) => ({ item, sectionId }));
-      setFilteredItems(scored);
-    }
-    setSelectedIndex(0);
+  const filteredItems = React.useMemo(() => {
+    if (!query) return allItems;
+    const lowerQuery = query.toLowerCase();
+    return allItems
+      .map(({ item, sectionId }) => {
+        const keywords = [item.label, item.description, ...(item.keywords || [])].join(" ").toLowerCase();
+        const labelMatch = item.label.toLowerCase().includes(lowerQuery);
+        const descMatch = item.description?.toLowerCase().includes(lowerQuery);
+        const keywordMatch = keywords.includes(lowerQuery);
+        let score = 0;
+        if (labelMatch) score += 10;
+        if (descMatch) score += 5;
+        if (keywordMatch) score += 2;
+        if (item.label.toLowerCase().startsWith(lowerQuery)) score += 20;
+        return score > 0 ? { item, sectionId, score } : null;
+      })
+      .filter((v): v is { item: CommandItem; sectionId: string; score: number } => v !== null)
+      .sort((a, b) => b.score - a.score)
+      .map(({ item, sectionId }) => ({ item, sectionId }));
   }, [query, allItems]);
 
   React.useEffect(() => {
-    if (open) {
-      setQuery("");
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+    if (!open) return;
+    const t = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(t);
   }, [open]);
 
   React.useEffect(() => {
@@ -121,7 +123,7 @@ export function CommandPalette({ sections, open, onOpenChange, placeholder = "Bu
           animate={reduced ? undefined : { opacity: 1 }}
           exit={reduced ? undefined : { opacity: 0 }}
           transition={reduced ? { duration: 0 } : motionPresets.fadeInUp.transition}
-          className="fixed inset-0 z-[var(--z-modal)] flex items-start justify-center pt-16"
+          className="fixed inset-0 z-(--z-modal) flex items-start justify-center pt-16"
           onKeyDown={handleKeyDown}
         >
           <motion.div
@@ -138,7 +140,10 @@ export function CommandPalette({ sections, open, onOpenChange, placeholder = "Bu
                 ref={inputRef}
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelectedIndex(0);
+                }}
                 placeholder={placeholder}
                 className="flex-1 bg-transparent text-base text-grafito dark:text-gris-100 placeholder:text-gris-400 focus:outline-none"
                 aria-label="Buscar comandos"
@@ -182,7 +187,7 @@ export function CommandPalette({ sections, open, onOpenChange, placeholder = "Bu
                         <li className="px-4 py-2 text-xs font-semibold text-gris-500 dark:text-gris-400 uppercase tracking-wider">
                           {section.title}
                         </li>
-                        {sectionItems.map(({ item }, index) => {
+                        {sectionItems.map(({ item }) => {
                           const globalIndex = filteredItems.findIndex((f) => f.item.id === item.id);
                           const isSelected = globalIndex === selectedIndex;
 

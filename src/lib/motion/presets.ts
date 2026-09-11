@@ -1,4 +1,4 @@
-import type { Transition, Variants, Easing } from "framer-motion";
+import type { Transition, Easing } from "framer-motion";
 
 const standardEasing: Easing = [0.4, 0, 0.2, 1];
 

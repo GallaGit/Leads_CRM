@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { motionPresets } from "@/lib/motion/presets";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface ProgressRingProps {
