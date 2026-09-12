@@ -1,4 +1,63 @@
-import type { BlockObjectRequest } from "@notionhq/client/build/src/api-endpoints";
+import type {
+  BlockObjectRequest,
+  RichTextItemRequest,
+  SelectColor,
+} from "@notionhq/client/build/src/api-endpoints";
+import type { TextRequest, StringRequest } from "@notionhq/client/build/src/api-endpoints/common";
+
+type NotionPageProperty =
+  | { title: Array<RichTextItemRequest>; type?: "title" }
+  | { rich_text: Array<RichTextItemRequest>; type?: "rich_text" }
+  | { number: number | null; type?: "number" }
+  | { url: TextRequest | null; type?: "url" }
+  | {
+      select: {
+        id: StringRequest;
+        name?: TextRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | {
+        name: TextRequest;
+        id?: StringRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | null;
+      type?: "select";
+    }
+  | {
+      multi_select: Array<{
+        id: StringRequest;
+        name?: TextRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | {
+        name: TextRequest;
+        id?: StringRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      }>;
+      type?: "multi_select";
+    }
+  | { email: TextRequest | null; type?: "email" }
+  | { phone_number: TextRequest | null; type?: "phone_number" }
+  | { date: { start: string; end?: string | null } | null; type?: "date" }
+  | { checkbox: boolean; type?: "checkbox" }
+  | {
+      status: {
+        id: StringRequest;
+        name?: TextRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | {
+        name: TextRequest;
+        id?: StringRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | null;
+      type?: "status";
+    };
+
+type NotionPageProperties = Record<string, NotionPageProperty>;
 import {
   getNotionClient,
   getNotionDataSourceId,
@@ -106,8 +165,7 @@ export class NotionLeadRepository implements LeadRepository {
 
     const page = await notion.pages.create({
       parent: { data_source_id },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      properties: properties as any,
+      properties: properties as NotionPageProperties,
     });
 
     const lead = mapNotionPageToLead(page);
@@ -138,8 +196,7 @@ export class NotionLeadRepository implements LeadRepository {
     const properties = leadPatchToNotionProperties(working);
     const page = await notion.pages.update({
       page_id: id,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      properties: properties as any,
+      properties: properties as NotionPageProperties,
     });
 
     if (patch.status !== undefined) {

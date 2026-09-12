@@ -1,4 +1,64 @@
-import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type {
+  PageObjectResponse,
+  RichTextItemRequest,
+  SelectColor,
+} from "@notionhq/client/build/src/api-endpoints";
+import type { TextRequest, StringRequest } from "@notionhq/client/build/src/api-endpoints/common";
+
+type NotionPageProperty =
+  | { title: Array<RichTextItemRequest>; type?: "title" }
+  | { rich_text: Array<RichTextItemRequest>; type?: "rich_text" }
+  | { number: number | null; type?: "number" }
+  | { url: TextRequest | null; type?: "url" }
+  | {
+      select: {
+        id: StringRequest;
+        name?: TextRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | {
+        name: TextRequest;
+        id?: StringRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | null;
+      type?: "select";
+    }
+  | {
+      multi_select: Array<{
+        id: StringRequest;
+        name?: TextRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | {
+        name: TextRequest;
+        id?: StringRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      }>;
+      type?: "multi_select";
+    }
+  | { email: TextRequest | null; type?: "email" }
+  | { phone_number: TextRequest | null; type?: "phone_number" }
+  | { date: { start: string; end?: string | null } | null; type?: "date" }
+  | { checkbox: boolean; type?: "checkbox" }
+  | {
+      status: {
+        id: StringRequest;
+        name?: TextRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | {
+        name: TextRequest;
+        id?: StringRequest;
+        color?: SelectColor;
+        description?: TextRequest | null;
+      } | null;
+      type?: "status";
+    };
+
+type NotionPageProperties = Record<string, NotionPageProperty>;
+
 import {
   type Lead,
   type LeadCreateInput,
@@ -147,8 +207,8 @@ export function mapNotionPageToLead(page: unknown): Lead | null {
 
 export function leadPatchToNotionProperties(
   patch: LeadPatch,
-): Record<string, unknown> {
-  const props: Record<string, unknown> = {};
+): NotionPageProperties {
+  const props: NotionPageProperties = {};
 
   if (patch.companyName !== undefined) {
     props["Empresa"] = {
@@ -265,7 +325,7 @@ export function leadPatchToNotionProperties(
 /** Map a validated create payload to Notion page properties (defaults included). */
 export function leadCreateToNotionProperties(
   input: LeadCreateInput,
-): { properties: Record<string, unknown>; notesOverflow: string | null } {
+): { properties: NotionPageProperties; notesOverflow: string | null } {
   const today = new Date().toISOString().slice(0, 10);
   const notesValue = input.notes ?? "";
   const { observaciones, overflow } = splitNotes(notesValue);

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Topbar } from "@/components/layout/topbar";
 import { Button } from "@/components/ui/button";
 import { useEnsureLeadsSynced } from "@/hooks/use-ensure-leads-synced";
@@ -31,8 +31,10 @@ export default function HomePage() {
   const setFilters = useUiStore((s) => s.setFilters);
 
   const queues = useMemo(() => buildWorkQueues(leads), [leads]);
-  const queueCount = (id: WorkQueueId) =>
-    queues.find((q) => q.id === id)?.count ?? 0;
+  const queueCount = useCallback(
+    (id: WorkQueueId) => queues.find((q) => q.id === id)?.count ?? 0,
+    [queues],
+  );
 
   const kpis = useMemo((): Kpi[] => {
     const by = (status: string) =>
@@ -75,8 +77,7 @@ export default function HomePage() {
         queue: "followup_overdue",
       },
     ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leads, queues]);
+  }, [leads, queueCount]);
 
   function openValidated() {
     setActiveQueue(null);
